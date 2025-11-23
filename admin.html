@@ -38,7 +38,7 @@
       font-size:14px;
     }
     label{display:block;font-size:13px;margin-bottom:4px;}
-    select, input[type="text"], input[type="number"]{
+    select, input[type="text"], input[type="password"]{
       width:100%;
       padding:6px 8px;
       border-radius:6px;
@@ -93,12 +93,26 @@
       margin-top:12px;
       width:100%;
     }
+    .player-row{
+      border-bottom:1px solid #262626;
+      padding:4px 0 8px;
+      font-size:13px;
+    }
+    .role-select{
+      margin-left:22px;
+      margin-top:4px;
+      display:none;
+    }
+    .disabled{
+      opacity:0.5;
+      pointer-events:none;
+    }
   </style>
 </head>
 <body>
 <header>
   <div class="brand">ADMIN <span>SAN SIRO</span> U14</div>
-  <div style="font-size:12px;color:#aaa;">Solo per mister / staff – dati salvati in questo browser</div>
+  <div style="font-size:12px;color:#aaa;">Solo mister / staff</div>
 </header>
 
 <div id="loginBox">
@@ -110,6 +124,7 @@
 
 <main id="adminPage" style="display:none;">
 
+  <!-- Selezione partita -->
   <div class="box">
     <h2>Partita da gestire</h2>
     <label for="matchSelect">Seleziona partita</label>
@@ -120,34 +135,63 @@
     <div class="info-line" id="mTimer"></div>
   </div>
 
+  <!-- Timer -->
   <div class="box">
-    <h2>Timer (MM:SS)</h2>
-    <div class="info-line">Usa START/STOP/RESET. Il valore viene salvato e letto dalla home.</div>
+    <h2>Timer</h2>
+    <div class="info-line">Il timer viene letto anche dalla home genitori.</div>
     <div style="font-size:24px;font-weight:700;margin:6px 0;" id="timerDisplay">00:00</div>
     <div class="row">
-      <button class="btn-main" onclick="startTimer()">START</button>
-      <button class="btn-sec" onclick="stopTimer()">STOP</button>
-      <button class="btn-reset" onclick="resetTimer()">RESET</button>
-      <button class="btn-fin" onclick="finishMatch()">FINE PARTITA</button>
+      <button class="btn-main" id="btnStart" onclick="startTimer()">START</button>
+      <button class="btn-sec" id="btnStop" onclick="stopTimer()">STOP</button>
+      <button class="btn-reset" id="btnResetTimer" onclick="resetTimer()">RESET TIMER</button>
+      <button class="btn-fin" id="btnFinish" onclick="finishMatch()">FINE PARTITA</button>
     </div>
   </div>
 
+  <!-- Risultato & Gol -->
   <div class="box">
-    <h2>Gol & Risultato</h2>
+    <h2>Risultato & Gol</h2>
     <div class="row">
-      <button class="btn-main" onclick="addGoal('home')">+ Gol San Siro</button>
-      <button class="btn-sec" onclick="addGoal('away')">+ Gol Avversari</button>
+      <button class="btn-main" id="btnGolHome" onclick="addGoal('home')">+ Gol San Siro</button>
+      <button class="btn-sec" id="btnGolAway" onclick="addGoal('away')">+ Gol Avversari</button>
+      <button class="btn-reset" id="btnResetMatch" onclick="resetMatchData()">RESET PARTITA</button>
     </div>
-    <div class="info-line" style="margin-top:8px;">
-      Verranno aggiornati: risultato, marcatori, assist e cronaca (minuto automatico).
+
+    <!-- Box fisso per MARCATORE / ASSIST -->
+    <div style="margin-top:12px;padding:10px;background:#111;border-radius:8px;">
+      <h3 style="margin:0 0 8px;">Marcatori San Siro</h3>
+
+      <label>Marcatore</label>
+      <select id="selMarcatore"></select>
+
+      <label>Assist</label>
+      <select id="selAssist"></select>
+
+      <div style="font-size:11px;color:#888;margin-top:4px;">
+        Per i gol avversari verrà chiesto un nome opzionale (se lasci vuoto: "Avversari").
+      </div>
     </div>
   </div>
 
+  <!-- Formazione con ruoli -->
+  <div class="box">
+    <h2>Formazione con ruoli (max 7 titolari)</h2>
+    <div class="info-line">
+      Spunta i titolari, poi scegli il ruolo. La panchina è automatica.
+    </div>
+    <div id="playersList"></div>
+    <div class="row" style="margin-top:8px;">
+      <button class="btn-main" id="btnSaveLineup" onclick="saveLineup()">Salva formazione</button>
+      <button class="btn-reset" id="btnClearLineup" onclick="clearLineup()">Svuota formazione</button>
+    </div>
+  </div>
+
+  <!-- Cronaca -->
   <div class="box">
     <h2>Cronaca libera</h2>
     <label for="evtText">Testo azione (es: "Occasione Ronda, tiro di poco a lato")</label>
     <input type="text" id="evtText" placeholder="Scrivi l'evento...">
-    <button class="btn-sec" style="margin-top:6px;width:100%;" onclick="addCustomEvent()">Aggiungi alla cronaca</button>
+    <button class="btn-sec" style="margin-top:6px;width:100%;" id="btnAddEvt" onclick="addCustomEvent()">Aggiungi alla cronaca</button>
     <div style="margin-top:10px;font-size:13px;color:#ccc;">
       Ultimi eventi:
     </div>
@@ -157,31 +201,30 @@
 </main>
 
 <script>
-  /* === CONFIG DATI, STESSI DI index.html === */
   const STORAGE_KEY = "ssn_matches_v2";
-  const ADMIN_PASS = "0102030499";
+  const ADMIN_PASS = "0102030499"; // password admin
 
-  function defaultLineup() {
-    return {
-      starting: [
-        "1 - Micucci Emanuele (POR)",
-        "6 - Maro Terenui Luca (DC)",
-        "11 - Rebaudengo Amedeo (TS)",
-        "25 - Panebianco Edoardo (TD)",
-        "8 - Vitarelli Alessandro (TRQ)",
-        "4 - Meazzi Timoteo (TRQ)",
-        "10 - Ronda Rocco (FW)"
-      ],
-      bench: [
-        "99 - Vitarelli Andrea",
-        "12 - Perez Sanabria Erik Joshue",
-        "5 - Risso Leonardo",
-        "35 - Buzzi Diego",
-        "7 - Lanini Gabriele",
-        "4 - Cerfogli Elio"
-      ]
-    };
-  }
+  const ROLES = ["POR","TD","TS","DC","SP","TRQ","FW"];
+
+  const PLAYERS = [
+    { number: 1,  name: "Perez Sanabria Erik Joshue" },
+    { number: 2,  name: "Beux Nicholas" },
+    { number: 4,  name: "Cerfogli Elio" },
+    { number: 5,  name: "Risso Leonardo" },
+    { number: 6,  name: "Maro Terenui Luca" },
+    { number: 7,  name: "Lanini Gabriele" },
+    { number: 8,  name: "Vitarelli Alessandro" },
+    { number: 9,  name: "Meazzi Timoteo" },
+    { number: 10, name: "Ronda Rocco" },
+    { number: 11, name: "Rebaudengo Amedeo" },
+    { number: 12, name: "Micucci Emanuele" },
+    { number: 18, name: "Meazzi Geremi" },
+    { number: 25, name: "Panebianco Edoardo" },
+    { number: 35, name: "Buzzi Diego" },
+    { number: 77, name: "Cota Levis" },
+    { number: 80, name: "Bruci Samuel" },
+    { number: 99, name: "Vitarelli Andrea" }
+  ];
 
   const baseMatches = [
     {
@@ -203,7 +246,7 @@
         { team: "away", name: "Meazzi Timoteo", assists: 1 }
       ],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 2,
@@ -229,7 +272,7 @@
         { team: "home", name: "Rebaudengo Amedeo", assists: 3 }
       ],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 3,
@@ -254,7 +297,7 @@
         { team: "away", name: "Rebaudengo Amedeo", assists: 1 }
       ],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 4,
@@ -271,7 +314,7 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 5,
@@ -288,7 +331,7 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 6,
@@ -305,7 +348,7 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 7,
@@ -322,11 +365,11 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     }
   ];
 
-  function deepClone(obj){return JSON.parse(JSON.stringify(obj));}
+  function deepClone(o){return JSON.parse(JSON.stringify(o));}
 
   function loadMatches(){
     try{
@@ -339,248 +382,439 @@
       return deepClone(baseMatches);
     }
   }
-  function saveMatches(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(matches));
-  }
+  function saveMatches(){localStorage.setItem(STORAGE_KEY,JSON.stringify(matches));}
 
   let matches = loadMatches();
-  let currentId = 4; // per oggi di default
+  let currentId = 4;
   let timerInterval = null;
   let lastTickTime = null;
 
-  /* === LOGIN === */
   function checkLogin(){
-    const v = document.getElementById("adminPass").value.trim();
-    if(v === ADMIN_PASS){
+    const v=document.getElementById("adminPass").value.trim();
+    if(v===ADMIN_PASS){
       document.getElementById("loginBox").style.display="none";
       document.getElementById("adminPage").style.display="block";
       initAdmin();
-    } else {
+    }else{
       alert("Password errata");
     }
   }
 
+  function formatTimer(sec){
+    const s=sec||0;
+    const mm=String(Math.floor(s/60)).padStart(2,"0");
+    const ss=String(s%60).padStart(2,"0");
+    return mm+":"+ss;
+  }
   function formatDateTime(dtStr){
-    const d = new Date(dtStr);
-    if(isNaN(d.getTime())) return dtStr;
+    const d=new Date(dtStr);
+    if(isNaN(d))return dtStr;
     const gg=String(d.getDate()).padStart(2,"0");
     const mm=String(d.getMonth()+1).padStart(2,"0");
     const hh=String(d.getHours()).padStart(2,"0");
     const mi=String(d.getMinutes()).padStart(2,"0");
     return `${gg}/${mm}/${d.getFullYear()} • ${hh}:${mi}`;
   }
-  function formatTimer(sec){
-    const s=sec||0;
-    const mm=String(Math.floor(s/60)).padStart(2,"0");
-    const ss=String(s%60).padStart(2,"0");
-    return `${mm}:${ss}`;
-  }
 
-  function statusLabel(m){
-    if(m.status==="FIN")return"Terminata";
-    if(m.status==="PRE")return"In programma";
-    if(m.status==="LIVE")return"LIVE";
-    return m.status||"";
+  function isTodayMatch(m){
+    const now=new Date();
+    const d=new Date(m.dateTime);
+    return d.getFullYear()===now.getFullYear() &&
+           d.getMonth()===now.getMonth() &&
+           d.getDate()===now.getDate();
   }
+  function isEditable(m){
+    if(!m) return false;
+
+    // Se la partita è finita → NON modificabile
+    if(m.status === "FIN") return false;
+
+    // PERMETTO SOLO la 4ª giornata (quella di oggi)
+    if(m.id === 4) return true;
+
+    // Tutte le altre NON modificabili
+    return false;
+}
+
 
   function initAdmin(){
-    const sel = document.getElementById("matchSelect");
-    sel.innerHTML = "";
-    matches
-      .slice()
-      .sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime))
-      .forEach(m=>{
-        const opt=document.createElement("option");
-        opt.value=m.id;
-        opt.textContent=`${m.round} – ${m.homeTeam} vs ${m.awayTeam}`;
-        sel.appendChild(opt);
-      });
-    // seleziona default (4 o il primo)
-    const exists = matches.find(m=>m.id===currentId);
+    const sel=document.getElementById("matchSelect");
+    sel.innerHTML="";
+    matches.forEach(m=>{
+      const opt=document.createElement("option");
+      opt.value=m.id;
+      opt.textContent=`${m.round} – ${m.homeTeam} vs ${m.awayTeam}`;
+      sel.appendChild(opt);
+    });
+    const exists=matches.find(m=>m.id===currentId);
     if(!exists) currentId = matches[0].id;
-    sel.value = currentId;
+    sel.value=currentId;
+
+    populateScorerSelects();
     renderMatch();
   }
 
-  function getCurrent(){
-    return matches.find(m=>m.id===Number(currentId));
+  function populateScorerSelects(){
+    const selM=document.getElementById("selMarcatore");
+    const selA=document.getElementById("selAssist");
+    if(!selM || !selA) return;
+    selM.innerHTML="";
+    selA.innerHTML="";
+
+    const optDefaultM=document.createElement("option");
+    optDefaultM.value="";
+    optDefaultM.textContent="Seleziona marcatore...";
+    selM.appendChild(optDefaultM);
+
+    const optNone=document.createElement("option");
+    optNone.value="NESSUNO";
+    optNone.textContent="Nessuno";
+    selA.appendChild(optNone);
+
+    PLAYERS.forEach(p=>{
+      const oM=document.createElement("option");
+      oM.value=p.name;
+      oM.textContent=`${p.number} - ${p.name}`;
+      selM.appendChild(oM);
+
+      const oA=document.createElement("option");
+      oA.value=p.name;
+      oA.textContent=`${p.number} - ${p.name}`;
+      selA.appendChild(oA);
+    });
   }
 
+  function getCurrent(){return matches.find(m=>m.id===Number(currentId));}
+
   function changeMatch(){
-    currentId = Number(document.getElementById("matchSelect").value);
-    stopTimer(); // per sicurezza
+    currentId=Number(document.getElementById("matchSelect").value);
+    stopTimer();
     renderMatch();
   }
 
   function renderMatch(){
-    const m = getCurrent();
+    const m=getCurrent();
     if(!m)return;
-    document.getElementById("mInfo").textContent =
-      `${m.round} • ${formatDateTime(m.dateTime)} • ${m.field}`;
+    const editable=isEditable(m);
+
     const scoreText =
       (m.homeScore==null || m.awayScore==null) ? "- : -" : `${m.homeScore} - ${m.awayScore}`;
+
+    document.getElementById("mInfo").textContent =
+      `${m.round} • ${formatDateTime(m.dateTime)} • ${m.field}`;
     document.getElementById("mScore").textContent =
       `${m.homeTeam} ${scoreText} ${m.awayTeam}`;
-    document.getElementById("mStatus").textContent = `Stato: ${statusLabel(m)}`;
-    document.getElementById("mTimer").textContent = `Timer salvato: ${formatTimer(m.seconds||0)}`;
+    document.getElementById("mStatus").textContent =
+      `Stato: ${m.status} ${editable ? "• MODIFICABILE OGGI" : "• SOLO LETTURA"}`;
+    document.getElementById("mTimer").textContent =
+      `Timer salvato: ${formatTimer(m.seconds||0)}`;
     document.getElementById("timerDisplay").textContent = formatTimer(m.seconds||0);
 
-    // cronaca breve
-    const list = document.getElementById("evtList");
-    const evts = (m.events||[]).slice().sort((a,b)=>(a.minute||0)-(b.minute||0));
-    list.innerHTML = evts.length
-      ? evts.slice(-5).map(e=>`<div class="evt-row"><b>${e.minute}'</b> ${e.text}</div>`).join("")
-      : "<div class='evt-row' style='color:#aaa;'>Ancora nessuna cronaca.</div>";
-  }
-
-/* ===============================
-      TIMER 15' + RECUPERO
-=============================== */
-
-function startTimer(){
-  const m = getCurrent();
-  if(!m) return;
-
-  if(m.status === "FIN"){
-    alert("La partita è già terminata.");
-    return;
-  }
-
-  // se PRE → inizia 1° tempo
-  if(m.status === "PRE"){
-    m.status = "1T";
-    m.seconds = 0;
-  }
-
-  // se era fermo in 1T o 2T → continua
-  if(!timerInterval){
-    lastTickTime = Date.now();
-    timerInterval = setInterval(()=>tickTimer(),1000);
-  }
-
-  saveMatches();
-  renderMatch();
-}
-
-function tickTimer(){
-  const m = getCurrent();
-  if(!m) return;
-
-  const now = Date.now();
-  const diff = Math.floor((now - lastTickTime)/1000);
-
-  if(diff > 0){
-    m.seconds += diff;
-    lastTickTime = now;
-
-    // cambio stato a RECUPERO
-    if(m.seconds >= 900 && m.status !== "RECUPERO" && m.status !== "2T" && m.status !== "FIN"){
-      m.status = "RECUPERO";
-    }
-
-    saveMatches();
-    document.getElementById("timerDisplay").textContent = formatTimer(m.seconds);
-    document.getElementById("mTimer").textContent = `Timer salvato: ${formatTimer(m.seconds)}`;
-    document.getElementById("mStatus").textContent = `Stato: ${statusLabel(m)}`;
-  }
-}
-
-function stopTimer(){
-  if(timerInterval){
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  lastTickTime = null;
-  saveMatches();
-  renderMatch();
-}
-
-function resetTimer(){
-  const m = getCurrent();
-  if(!m) return;
-  if(!confirm("Azzero timer e riporto la partita a PRE?")) return;
-
-  m.seconds = 0;
-  m.status = "PRE";
-  stopTimer();
-}
-
-function finishMatch(){
-  const m = getCurrent();
-  if(!m) return;
-
-  if(!confirm("Segni la partita come TERMINATA?")) return;
-
-  m.status = "FIN";
-  stopTimer();
-  saveMatches();
-  renderMatch();
-}
-
-
-  /* GOL & CRONACA */
-  function addGoal(team){
-    const m=getCurrent(); if(!m)return;
-    const who = prompt(team==="home" ? "Nome marcatore San Siro:" : "Nome marcatore avversari:");
-    if(!who) return;
-    const assist = prompt("Assist (lascia vuoto se nessuno):");
-    const minute = Math.floor((m.seconds||0)/60);
-
-    // aggiorno risultato
-    if(team==="home"){
-      m.homeScore = (m.homeScore==null ? 0 : m.homeScore) + 1;
-    }else{
-      m.awayScore = (m.awayScore==null ? 0 : m.awayScore) + 1;
-    }
-
-    // aggiorno lista marcatori
-    if(!m.goals) m.goals=[];
-    let g = m.goals.find(x=>x.name===who && x.team===team);
-    if(!g){
-      g = {team, name:who, goals:0};
-      m.goals.push(g);
-    }
-    g.goals += 1;
-
-    // assist
-    if(assist && assist.trim()){
-      if(!m.assists) m.assists=[];
-      let a = m.assists.find(x=>x.name===assist.trim());
-      if(!a){
-        a={name:assist.trim(), assists:0};
-        m.assists.push(a);
-      }
-      a.assists += 1;
-    }
-
-    // evento cronaca
-    if(!m.events) m.events=[];
-    m.events.push({
-      minute: minute,
-      text: team==="home"
-        ? `GOL SAN SIRO – ${who}${assist? " (assist "+assist+")":""}`
-        : `Gol avversari – ${who}${assist? " (assist "+assist+")":""}`
+    const ids=["btnStart","btnStop","btnResetTimer","btnFinish","btnGolHome","btnGolAway",
+               "btnResetMatch","btnSaveLineup","btnClearLineup","btnAddEvt","evtText"];
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      el.disabled=!editable;
+      if(!editable) el.classList.add("disabled");
+      else el.classList.remove("disabled");
     });
 
+    renderPlayers(m, editable);
+    renderEvents(m);
+  }
+
+  function renderPlayers(m, editable){
+    const box=document.getElementById("playersList");
+    box.innerHTML="";
+    if(!m.lineup || !m.lineup.players) m.lineup={players:{}};
+
+    PLAYERS.forEach(p=>{
+      const info=m.lineup.players[p.number] || {starter:false, role:""};
+      const row=document.createElement("div");
+      row.className="player-row";
+
+      const chkId=`chk_${p.number}`;
+      const roleId=`role_${p.number}`;
+
+      row.innerHTML=`
+        <label>
+          <input type="checkbox" id="${chkId}" ${info.starter?"checked":""} ${!editable?"disabled":""}
+                 onchange="toggleRole(${p.number})">
+          ${p.number} - ${p.name}
+        </label>
+        <select id="${roleId}" class="role-select" ${!editable?"disabled":""}>
+          <option value="">Ruolo...</option>
+          ${ROLES.map(r=>`<option value="${r}" ${info.role===r?"selected":""}>${r}</option>`).join("")}
+        </select>
+      `;
+      box.appendChild(row);
+
+      const roleSelect=row.querySelector("select");
+      if(info.starter) roleSelect.style.display="block";
+      else roleSelect.style.display="none";
+    });
+  }
+
+  function toggleRole(num){
+    const chk=document.getElementById(`chk_${num}`);
+    const sel=document.getElementById(`role_${num}`);
+    if(chk && sel){
+      sel.style.display = chk.checked ? "block" : "none";
+      if(!chk.checked) sel.value="";
+    }
+  }
+
+  function saveLineup(){
+    const m=getCurrent();
+    if(!m)return;
+    if(!isEditable(m)){
+      alert("Questa partita non è modificabile (cronaca storica o non di oggi).");
+      return;
+    }
+    m.lineup={players:{}};
+    let starters=0;
+
+    for(const p of PLAYERS){
+      const chk=document.getElementById(`chk_${p.number}`);
+      const sel=document.getElementById(`role_${p.number}`);
+      if(!chk || !sel) continue;
+
+      if(chk.checked){
+        starters++;
+        if(starters>7){
+          alert("Puoi selezionare massimo 7 titolari.");
+          return;
+        }
+        if(!sel.value){
+          alert("Scegli il ruolo per "+p.number+" - "+p.name);
+          return;
+        }
+        m.lineup.players[p.number]={starter:true, role:sel.value};
+      }else{
+        m.lineup.players[p.number]={starter:false, role:""};
+      }
+    }
+    saveMatches();
+    alert("Formazione salvata.");
+  }
+
+  function clearLineup(){
+    const m=getCurrent();
+    if(!m)return;
+    if(!isEditable(m)){
+      alert("Non puoi modificare la formazione di una partita storica.");
+      return;
+    }
+    if(!confirm("Svuotare formazione e panchina di questa partita?"))return;
+    m.lineup={players:{}};
     saveMatches();
     renderMatch();
   }
 
+  function startTimer(){
+    const m=getCurrent();
+    if(!m)return;
+    if(!isEditable(m)){
+      alert("Partita non modificabile.");
+      return;
+    }
+    if(m.status==="PRE") m.status="LIVE";
+    if(!timerInterval){
+      lastTickTime=Date.now();
+      timerInterval=setInterval(tickTimer,1000);
+    }
+    saveMatches();
+    renderMatch();
+  }
+
+  function tickTimer(){
+    const m=getCurrent();
+    if(!m)return;
+    const now=Date.now();
+    const diff=Math.floor((now-lastTickTime)/1000);
+    if(diff>0){
+      m.seconds=(m.seconds||0)+diff;
+      lastTickTime=now;
+      saveMatches();
+      document.getElementById("timerDisplay").textContent=formatTimer(m.seconds);
+      document.getElementById("mTimer").textContent=`Timer salvato: ${formatTimer(m.seconds)}`;
+    }
+  }
+
+  function stopTimer(){
+    if(timerInterval){
+      clearInterval(timerInterval);
+      timerInterval=null;
+    }
+    lastTickTime=null;
+    saveMatches();
+  }
+
+  function resetTimer(){
+    const m=getCurrent();
+    if(!m)return;
+    if(!isEditable(m)){
+      alert("Non puoi resettare il timer di una partita storica.");
+      return;
+    }
+    if(!confirm("Azzero il timer e riporto la partita a PRE?"))return;
+    m.seconds=0;
+    m.status="PRE";
+    stopTimer();
+    saveMatches();
+    renderMatch();
+  }
+
+  function finishMatch(){
+    const m=getCurrent();
+    if(!m)return;
+    if(!isEditable(m)){
+      alert("Questa partita non è più modificabile.");
+      return;
+    }
+    if(!confirm("Segni la partita come TERMINATA?"))return;
+    m.status="FIN";
+    stopTimer();
+    saveMatches();
+    renderMatch();
+  }
+
+  function resetMatchData(){
+    const m=getCurrent();
+    if(!m)return;
+    if(!isEditable(m)){
+      alert("Non puoi resettare una partita non di oggi o già finita.");
+      return;
+    }
+    if(!confirm("RESET PARTITA: azzero risultato, cronaca, gol, assist, timer e formazione SOLO per questa partita. Confermi?"))return;
+    m.homeScore=null;
+    m.awayScore=null;
+    m.seconds=0;
+    m.status="PRE";
+    m.goals=[];
+    m.assists=[];
+    m.events=[];
+    m.lineup={players:{}};
+    stopTimer();
+    saveMatches();
+    renderMatch();
+  }
+
+function addGoal(team){
+    const m = getCurrent(); 
+    if(!m) return;
+
+    if(!isEditable(m)){
+      alert("Partita non modificabile.");
+      return;
+    }
+
+    let who = "";
+    let assist = "NESSUNO";
+
+    // Gol SAN SIRO: menu marcatore/assist
+    if(team === "home"){
+        const selM = document.getElementById("selMarcatore");
+        const selA = document.getElementById("selAssist");
+        if(!selM || !selA){
+            alert("Menu non trovato.");
+            return;
+        }
+        who = selM.value;
+        assist = selA.value || "NESSUNO";
+
+        if(!who){
+            alert("Seleziona il marcatore.");
+            return;
+        }
+    } 
+    // Gol AVVERSARI: input libero
+    else {
+        const raw = prompt("Nome marcatore avversari (vuoto = Avversari):");
+        who = raw && raw.trim() ? raw.trim() : "Avversari";
+        assist = "NESSUNO";
+    }
+
+    // Se il timer è fermo → CHIEDI MINUTO
+    let minute = 0;
+    if(!m.seconds || m.seconds === 0){
+        const manual = prompt("Minuto del gol?");
+        minute = parseInt(manual);
+        if(isNaN(minute)) minute = 0;
+    } 
+    // Altrimenti usa timer live
+    else {
+        minute = Math.floor((m.seconds||0)/60);
+    }
+
+    // Aggiorna punteggio
+    if(team==="home"){
+      m.homeScore = (m.homeScore==null?0:m.homeScore)+1;
+    } else {
+      m.awayScore = (m.awayScore==null?0:m.awayScore)+1;
+    }
+
+    // Aggiorna marcatori
+    if(!m.goals) m.goals=[];
+    let g = m.goals.find(x => x.name === who && x.team === team);
+    if(!g){
+        g = { team, name: who, goals: 0 };
+        m.goals.push(g);
+    }
+    g.goals++;
+
+    // Aggiorna assist
+    if(assist !== "NESSUNO"){
+        if(!m.assists) m.assists=[];
+        let a = m.assists.find(x=>x.name===assist);
+        if(!a){
+            a = {name:assist, assists:0};
+            m.assists.push(a);
+        }
+        a.assists++;
+    }
+
+    // Cronaca
+    if(!m.events)m.events=[];
+    m.events.push({
+      minute,
+      text: team==="home"
+        ? `GOL SAN SIRO – ${who}${assist!=="NESSUNO" ? " (assist "+assist+")":""}`
+        : `Gol avversari – ${who}`
+    });
+
+    saveMatches();
+    renderMatch();
+}
+
+
   function addCustomEvent(){
     const m=getCurrent(); if(!m)return;
-    const txt = document.getElementById("evtText").value.trim();
-    if(!txt) return;
-    const minute = Math.floor((m.seconds||0)/60);
-    if(!m.events) m.events=[];
-    m.events.push({minute, text:txt});
+    if(!isEditable(m)){
+      alert("Partita non modificabile.");
+      return;
+    }
+    const txt=document.getElementById("evtText").value.trim();
+    if(!txt)return;
+    const minute=Math.floor((m.seconds||0)/60);
+    if(!m.events)m.events=[];
+    m.events.push({minute,text:txt});
     document.getElementById("evtText").value="";
     saveMatches();
     renderMatch();
   }
 
-  // Se avevi già aperto l'admin nello stesso browser, puoi saltare il login
-  window.addEventListener("load", ()=>{
-    // niente auto-login per sicurezza, ma potresti salvarlo se vuoi
+  function renderEvents(m){
+    const list=document.getElementById("evtList");
+    const evts=(m.events||[]).slice().sort((a,b)=>(a.minute||0)-(b.minute||0));
+    list.innerHTML = evts.length
+      ? evts.slice(-5).map(e=>`<div class="evt-row"><b>${e.minute}'</b> ${e.text}</div>`).join("")
+      : "<div class='evt-row' style='color:#aaa;'>Ancora nessuna cronaca.</div>";
+  }
+
+  window.addEventListener("load",()=>{
+    // non inizializzo finché non fai login
   });
 </script>
 </body>

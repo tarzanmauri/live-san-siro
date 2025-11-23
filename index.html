@@ -5,17 +5,13 @@
   <title>Diretta San Siro Nervi U14</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      color-scheme: dark;
-    }
-    * {
-      box-sizing: border-box;
-    }
+    :root { color-scheme: dark; }
+    * { box-sizing:border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0b0b0b;
-      color: #f5f5f5;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#0b0b0b;
+      color:#f5f5f5;
     }
     header {
       position: sticky;
@@ -33,9 +29,7 @@
       font-weight: 700;
       letter-spacing: 0.06em;
     }
-    .brand span {
-      color: #e50914;
-    }
+    .brand span { color:#e50914; }
     .tag-cat {
       font-size: 12px;
       padding: 3px 8px;
@@ -56,8 +50,6 @@
       font-size: 12px;
       color: #aaa;
     }
-
-    /* Countdown */
     #nextMatchBox {
       background: #181818;
       border-radius: 12px;
@@ -67,226 +59,86 @@
       flex-direction: column;
       gap: 6px;
     }
-    .nm-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
+    .nm-title { font-size:14px;font-weight:600; }
     #countdown {
-      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 22px;
       font-weight: 700;
     }
     .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid #444;
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:11px;
+      border:1px solid #444;
     }
-    .pill-live {
-      border-color: #e50914;
-      color: #e50914;
-    }
-    .pill-pre {
-      border-color: #888;
-      color: #bbb;
-    }
-    .pill-fin {
-      border-color: #4caf50;
-      color: #4caf50;
+    .pill-live { border-color:#e50914;color:#e50914; }
+    .pill-pre { border-color:#888;color:#bbb; }
+    .pill-fin { border-color:#4caf50;color:#4caf50; }
+
+    .box{
+      background:#181818;
+      border-radius:10px;
+      border:1px solid #262626;
+      padding:10px 12px;
+      margin-bottom:10px;
+      font-size:14px;
     }
 
-    /* Lista partite */
-    .match-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .match-list { display:flex;flex-direction:column;gap:8px; }
     .match-card {
-      background: #181818;
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px solid #262626;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      background:#181818;
+      border-radius:10px;
+      padding:10px 12px;
+      border:1px solid #262626;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
     .match-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: #aaa;
+      display:flex;
+      justify-content:space-between;
+      font-size:11px;
+      color:#aaa;
     }
-    .match-round {
-      font-weight: 600;
-      color: #f5f5f5;
-    }
+    .match-round { font-weight:600;color:#f5f5f5; }
     .teams-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 4px;
-      gap: 5px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:5px;
     }
-    .team-name {
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .team-name.sansiro {
-      color: #fff;
-      font-weight: 700;
-    }
+    .team-name { font-size:14px;font-weight:500; }
+    .team-name.sansiro { font-weight:700; }
     .score {
-      font-size: 20px;
-      font-weight: 700;
-      min-width: 60px;
-      text-align: center;
+      font-size:20px;
+      font-weight:700;
+      min-width:60px;
+      text-align:center;
     }
     .status-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: #888;
-    }
-    .btn-small {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid #333;
-      background: #222;
-      color: #eee;
-      cursor: pointer;
-    }
-    .btn-small:hover {
-      background: #333;
+      font-size:11px;
+      color:#888;
     }
 
-    /* Top marcatori */
-    #topScorersBox {
-      background: #181818;
-      border-radius: 10px;
-      border: 1px solid #262626;
-      padding: 10px 12px;
-      font-size: 14px;
-    }
-    .ts-row {
-      padding: 5px 0;
-      border-bottom: 1px solid #262626;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-    .ts-name {
-      font-weight: 600;
-    }
-    .ts-num {
-      font-size: 12px;
-      color: #ccc;
-      white-space: nowrap;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 11px;
-      color: #666;
-      padding: 10px 0 18px;
-    }
-
-    /* MATCH CENTER */
-    #matchCenter {
-      display: none;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 14px 10px 40px;
-    }
-    .back-btn {
-      margin-bottom: 10px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: none;
-      background: #e50914;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .box {
-      background: #181818;
-      border-radius: 10px;
-      border: 1px solid #262626;
-      padding: 10px 12px;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-    .mc-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 4px 0 2px;
-    }
-    .mc-score {
-      font-size: 22px;
-      font-weight: 800;
-      margin: 4px 0 6px;
-    }
-    .mc-line {
-      font-size: 13px;
-      color: #ccc;
-    }
     .evt-row {
       padding: 4px 0;
       border-bottom: 1px solid #262626;
       font-size: 13px;
     }
 
-    /* Voti & MVP */
-    .rating-row {
-      padding: 5px 0;
-      border-bottom: 1px solid #262626;
-      font-size: 14px;
-    }
-    .rating-name {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .rating-dots span {
-      display: inline-block;
-      margin-right: 4px;
-      margin-bottom: 2px;
-      padding: 2px 5px;
-      border-radius: 6px;
-      border: 1px solid #444;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .rating-dots span.active {
-      background: #e5c14d;
-      color: #000;
-      border-color: #e5c14d;
-      font-weight: 700;
-    }
-    .mvp-btn {
-      width: 100%;
-      margin-bottom: 6px;
-      padding: 7px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #222;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .mvp-btn.selected {
-      background: #e5c14d;
-      color: #000;
-      font-weight: 700;
+    footer{
+      text-align:center;
+      font-size:11px;
+      color:#666;
+      padding:10px 0 18px;
     }
 
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
+    @media (max-width:600px){
+      header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:4px;
       }
     }
   </style>
@@ -297,7 +149,7 @@
   <div class="tag-cat">Campionato 2025/26</div>
 </header>
 
-<main id="mainPage">
+<main>
   <h2>Prossima partita</h2>
   <div id="nextMatchBox">
     <div class="nm-title" id="nextMatchInfo">Caricamento…</div>
@@ -305,97 +157,44 @@
     <div id="nextMatchStatus" class="sub"></div>
   </div>
 
-  <h2>Partite U14</h2>
+  <h2>Partita di oggi</h2>
+  <div id="todayMatchBox" class="box">
+    <div class="sub">Nessuna partita in programma per oggi.</div>
+  </div>
+
+  <h2>Tutte le partite U14</h2>
   <div class="sub" style="margin-bottom:6px;">
-    Tocca su <b>Match Center</b> per vedere cronaca, marcatori, voti e MVP.
+    Risultati e stato aggiornati dal mister in tempo reale.
   </div>
   <div id="matchesList" class="match-list"></div>
-
-  <h2>Classifica marcatori</h2>
-  <div id="topScorersBox">Caricamento…</div>
 </main>
 
-<div id="matchCenter">
-  <button class="back-btn" onclick="closeMatchCenter()">← Torna alle partite</button>
-
-  <div class="box">
-    <div class="mc-title" id="mcTitle"></div>
-    <div class="mc-score" id="mcScore"></div>
-    <div class="mc-line" id="mcInfo"></div>
-    <div class="mc-line" id="mcTimer"></div>
-  </div>
-
-  <div class="box">
-    <b>Marcatori San Siro</b>
-    <div id="mcGoalsHome"></div>
-    <hr style="border:none;border-top:1px solid #262626;margin:6px 0;">
-    <b>Marcatori Avversari</b>
-    <div id="mcGoalsAway"></div>
-  </div>
-
-  <div class="box">
-    <b>Assist</b>
-    <div id="mcAssists"></div>
-  </div>
-
-  <div class="box">
-    <b>Formazione iniziale</b>
-    <div id="mcLineup"></div>
-    <hr style="border:none;border-top:1px solid #262626;margin:6px 0;">
-    <b>Panchina</b>
-    <div id="mcBench"></div>
-  </div>
-
-  <div class="box">
-    <b>Cronaca</b>
-    <div id="mcEvents"></div>
-  </div>
-
-  <div class="box">
-    <b>Voti giocatori</b>
-    <div id="mcRatings"></div>
-    <div style="font-size:11px;color:#999;margin-top:4px;">
-      Ogni dispositivo può esprimere un voto per giocatore (salvato solo in questo browser).
-    </div>
-  </div>
-
-  <div class="box">
-    <b>MVP del match</b>
-    <div id="mcMvp"></div>
-  </div>
-</div>
-
 <footer>
-  Diretta San Siro Nervi U14 – versione senza server, dati gestiti in locale dal mister
+  Diretta San Siro Nervi U14 – dati gestiti in locale dal mister
 </footer>
 
 <script>
-  /* ===============================
-     CONFIG DATI DI BASE
-  =============================== */
   const STORAGE_KEY = "ssn_matches_v2";
 
-  function defaultLineup() {
-    return {
-      starting: [
-        "1 - Micucci Emanuele (POR)",
-        "6 - Maro Terenui Luca (DC)",
-        "11 - Rebaudengo Amedeo (TS)",
-        "25 - Panebianco Edoardo (TD)",
-        "8 - Vitarelli Alessandro (TRQ)",
-        "4 - Meazzi Timoteo (TRQ)",
-        "10 - Ronda Rocco (FW)"
-      ],
-      bench: [
-        "99 - Vitarelli Andrea",
-        "12 - Perez Sanabria Erik Joshue",
-        "5 - Risso Leonardo",
-        "35 - Buzzi Diego",
-        "7 - Lanini Gabriele",
-        "4 - Cerfogli Elio"
-      ]
-    };
-  }
+  const PLAYERS = [
+    { number: 1,  name: "Perez Sanabria Erik Joshue" },
+    { number: 2,  name: "Beux Nicholas" },
+    { number: 4,  name: "Cerfogli Elio" },
+    { number: 5,  name: "Risso Leonardo" },
+    { number: 6,  name: "Maro Terenui Luca" },
+    { number: 7,  name: "Lanini Gabriele" },
+    { number: 8,  name: "Vitarelli Alessandro" },
+    { number: 9,  name: "Meazzi Timoteo" },
+    { number: 10, name: "Ronda Rocco" },
+    { number: 11, name: "Rebaudengo Amedeo" },
+    { number: 12, name: "Micucci Emanuele" },
+    { number: 18, name: "Meazzi Geremi" },
+    { number: 25, name: "Panebianco Edoardo" },
+    { number: 35, name: "Buzzi Diego" },
+    { number: 77, name: "Cota Levis" },
+    { number: 80, name: "Bruci Samuel" },
+    { number: 99, name: "Vitarelli Andrea" }
+  ];
 
   const baseMatches = [
     {
@@ -417,7 +216,7 @@
         { team: "away", name: "Meazzi Timoteo", assists: 1 }
       ],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 2,
@@ -443,7 +242,7 @@
         { team: "home", name: "Rebaudengo Amedeo", assists: 3 }
       ],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 3,
@@ -468,7 +267,7 @@
         { team: "away", name: "Rebaudengo Amedeo", assists: 1 }
       ],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 4,
@@ -485,7 +284,7 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 5,
@@ -502,7 +301,7 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 6,
@@ -519,7 +318,7 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     },
     {
       id: 7,
@@ -536,386 +335,252 @@
       goals: [],
       assists: [],
       events: [],
-      lineup: defaultLineup()
+      lineup: { players: {} }
     }
   ];
 
-  function deepClone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  function loadMatches() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return deepClone(baseMatches);
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || !parsed.length) return deepClone(baseMatches);
+  function deepClone(o){return JSON.parse(JSON.stringify(o));}
+  function loadMatches(){
+    try{
+      const raw=localStorage.getItem(STORAGE_KEY);
+      if(!raw) return deepClone(baseMatches);
+      const parsed=JSON.parse(raw);
+      if(!Array.isArray(parsed)||!parsed.length) return deepClone(baseMatches);
       return parsed;
-    } catch (e) {
+    }catch(e){
       return deepClone(baseMatches);
     }
   }
 
-  function saveMatches(matches) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(matches));
-  }
-
   let matches = loadMatches();
-  let lastSnapshot = localStorage.getItem(STORAGE_KEY) || "";
-  let countdownInterval = null;
-  let currentMatchCenterId = null;
+  let countdownInterval=null;
 
-  function formatDateTime(dtStr) {
-    const d = new Date(dtStr);
-    if (Number.isNaN(d.getTime())) return dtStr;
-    const gg = String(d.getDate()).padStart(2,"0");
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const hh = String(d.getHours()).padStart(2,"0");
-    const mi = String(d.getMinutes()).padStart(2,"0");
+  function formatDateTime(dtStr){
+    const d=new Date(dtStr);
+    if(isNaN(d))return dtStr;
+    const gg=String(d.getDate()).padStart(2,"0");
+    const mm=String(d.getMonth()+1).padStart(2,"0");
+    const hh=String(d.getHours()).padStart(2,"0");
+    const mi=String(d.getMinutes()).padStart(2,"0");
     return `${gg}/${mm}/${d.getFullYear()} • ${hh}:${mi}`;
   }
-
-  function formatCountdown(diffMs) {
-    let totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
-    const hh = String(Math.floor(totalSeconds / 3600)).padStart(2,"0");
-    totalSeconds %= 3600;
-    const mm = String(Math.floor(totalSeconds / 60)).padStart(2,"0");
-    const ss = String(totalSeconds % 60).padStart(2,"0");
+  function formatCountdown(diffMs){
+    let totalSeconds=Math.max(0,Math.floor(diffMs/1000));
+    const hh=String(Math.floor(totalSeconds/3600)).padStart(2,"0");
+    totalSeconds%=3600;
+    const mm=String(Math.floor(totalSeconds/60)).padStart(2,"0");
+    const ss=String(totalSeconds%60).padStart(2,"0");
     return `${hh}:${mm}:${ss}`;
   }
-
-  function formatTimer(seconds) {
-    const s = seconds || 0;
-    const mm = String(Math.floor(s / 60)).padStart(2,"0");
-    const ss = String(s % 60).padStart(2,"0");
+  function formatTimer(sec){
+    const s=sec||0;
+    const mm=String(Math.floor(s/60)).padStart(2,"0");
+    const ss=String(s%60).padStart(2,"0");
     return `${mm}:${ss}`;
   }
 
-  function statusLabel(m) {
-    if (m.status === "FIN") return "Terminata";
-    if (m.status === "PRE") return "In programma";
-    if (m.status === "LIVE") return "LIVE";
-    return m.status || "";
+  function getNextMatch(){
+    const now=new Date();
+    const upcoming=matches
+      .map(m=>({...m,dt:new Date(m.dateTime)}))
+      .filter(m=>m.status==="PRE" && m.dt>now)
+      .sort((a,b)=>a.dt-b.dt);
+    return upcoming[0]||null;
   }
 
-  function statusClass(m) {
-    if (m.status === "FIN") return "pill pill-fin";
-    if (m.status === "PRE") return "pill pill-pre";
-    return "pill pill-live"; // tutto ciò che non è PRE e non è FIN lo consideriamo LIVE
+  function getTodayMatch(){
+    const now=new Date();
+    return matches.find(m=>{
+      const d=new Date(m.dateTime);
+      return d.getFullYear()===now.getFullYear() &&
+             d.getMonth()===now.getMonth() &&
+             d.getDate()===now.getDate();
+    })||null;
   }
 
-  function getNextMatch() {
-    const now = new Date();
-    const upcoming = matches
-      .map(m => ({...m, dt: new Date(m.dateTime)}))
-      .filter(m => m.status === "PRE" && m.dt.getTime() > now.getTime())
-      .sort((a,b) => a.dt - b.dt);
-    return upcoming[0] || null;
-  }
+  function renderCountdown(){
+    const info=document.getElementById("nextMatchInfo");
+    const cd=document.getElementById("countdown");
+    const st=document.getElementById("nextMatchStatus");
+    if(countdownInterval)clearInterval(countdownInterval);
 
-  function renderCountdown() {
-    const box = document.getElementById("nextMatchBox");
-    const info = document.getElementById("nextMatchInfo");
-    const cd = document.getElementById("countdown");
-    const st = document.getElementById("nextMatchStatus");
-
-    if (countdownInterval) clearInterval(countdownInterval);
-
-    const next = getNextMatch();
-
-    if (!next) {
-      info.textContent = "Nessuna partita in programma.";
-      cd.textContent = "--:--:--";
-      st.innerHTML = "";
+    const next=getNextMatch();
+    if(!next){
+      info.textContent="Nessuna partita in programma.";
+      cd.textContent="--:--:--";
+      st.textContent="";
       return;
     }
 
-    const dt = new Date(next.dateTime);
-    info.textContent = `${next.round} • ${next.homeTeam} vs ${next.awayTeam} (${formatDateTime(next.dateTime)})`;
+    const dt=new Date(next.dateTime);
+    info.textContent=`${next.round} • ${next.homeTeam} vs ${next.awayTeam} (${formatDateTime(next.dateTime)})`;
 
-    function update() {
-      const copy = matches.find(m => m.id === next.id) || next;
-      if (copy.status === "LIVE" || copy.status === "1T" || copy.status === "2T" || copy.status === "RECUPERO") {
-        cd.textContent = "CALCIO D'INIZIO!";
-        st.innerHTML = `<span class="pill pill-live">LIVE</span>`;
-        clearInterval(countdownInterval);
+    function update(){
+      const now=new Date();
+      const match = matches.find(m=>m.id===next.id) || next;
+      if(match.status==="LIVE"){
+        cd.textContent="IN CORSO";
+        st.innerHTML=`<span class="pill pill-live">LIVE</span>`;
         return;
       }
-      if (copy.status === "FIN") {
-        cd.textContent = "PARTITA TERMINATA";
-        st.innerHTML = `<span class="pill pill-fin">Terminata</span>`;
-        clearInterval(countdownInterval);
+      if(match.status==="FIN"){
+        cd.textContent="PARTITA TERMINATA";
+        st.innerHTML=`<span class="pill pill-fin">Terminata</span>`;
         return;
       }
-
-      const now = new Date();
-      const diff = dt - now;
-      if (diff <= 0) {
-        cd.textContent = "Pronta a partire…";
-        st.innerHTML = `<span class="pill pill-pre">Calcio d'inizio previsto alle ${formatDateTime(next.dateTime).split("•")[1].trim()}</span>`;
+      const diff=dt-now;
+      if(diff<=0){
+        cd.textContent="Pronta a partire…";
+        st.innerHTML=`<span class="pill pill-pre">Attesa calcio d'inizio</span>`;
         return;
       }
-
-      cd.textContent = formatCountdown(diff);
-      st.innerHTML = `<span class="pill pill-pre">Mancano</span>`;
+      cd.textContent=formatCountdown(diff);
+      st.innerHTML=`<span class="pill pill-pre">Mancano</span>`;
     }
-
     update();
-    countdownInterval = setInterval(update, 1000);
+    countdownInterval=setInterval(update,1000);
   }
 
-  function renderMatches() {
-    const box = document.getElementById("matchesList");
-    box.innerHTML = "";
+  function getLineup(m){
+    const players = (m.lineup && m.lineup.players) ? m.lineup.players : {};
+    const starters=[];
+    const bench=[];
+    const order=["POR","TD","TS","DC","SP","TRQ","FW"];
 
-    matches.forEach(m => {
-      const home = m.homeScore !== null && m.homeScore !== undefined ? m.homeScore : "-";
-      const away = m.awayScore !== null && m.awayScore !== undefined ? m.awayScore : "-";
+    PLAYERS.forEach(p=>{
+      const info=players[p.number] || {starter:false, role:""};
+      if(info.starter){
+        starters.push({
+          number:p.number,
+          name:p.name,
+          role:info.role || ""
+        });
+      }else{
+        bench.push({
+          number:p.number,
+          name:p.name
+        });
+      }
+    });
 
-      let label;
-      if (m.status === "FIN") label = "Terminata";
-      else if (m.status === "PRE") label = "Da giocare";
-      else label = statusLabel(m); // es. 1T, 2T, RECUPERO
+    starters.sort((a,b)=>{
+      const ia=order.indexOf(a.role);
+      const ib=order.indexOf(b.role);
+      return (ia<0?99:ia)-(ib<0?99:ib);
+    });
 
-      const div = document.createElement("div");
-      div.className = "match-card";
-      div.innerHTML = `
+    return {starters, bench};
+  }
+
+  function renderTodayMatch(){
+    const box=document.getElementById("todayMatchBox");
+    const m=getTodayMatch();
+    if(!m){
+      box.innerHTML=`<div class="sub">Nessuna partita in programma per oggi.</div>`;
+      return;
+    }
+    const home=(m.homeScore==null)?"-":m.homeScore;
+    const away=(m.awayScore==null)?"-":m.awayScore;
+    const lu=getLineup(m);
+    const events=(m.events||[]).slice().sort((a,b)=>(a.minute||0)-(b.minute||0));
+
+    const marcatori=(m.goals||[]).length
+      ? (m.goals||[]).map(g=>`${g.team==="home"?"San Siro":"Avversari"} – ${g.name} (${g.goals})`).join("<br>")
+      : "—";
+
+
+    const assistHtml = (m.assists||[]).length
+      ? (m.assists||[]).map(a=>`${a.name} (${a.assists})`).join("<br>")
+      : "—";
+
+    const cronacaHtml = events.length
+      ? events.map(e=>`<div class="evt-row"><b>${e.minute}'</b> — ${e.text}</div>`).join("")
+      : "<i style='color:#999;'>Ancora nessuna azione registrata.</i>";
+
+    box.innerHTML = `
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px;">
+        ${m.homeTeam} vs ${m.awayTeam}
+      </div>
+      <div style="font-size:22px;font-weight:800;margin-bottom:6px;">
+        ${home} - ${away}
+      </div>
+      <div class="sub">
+        ${m.round} • ${formatDateTime(m.dateTime)} • ${m.field}
+      </div>
+      <div class="sub" style="margin-top:4px;">
+        Stato: ${m.status} • Timer: ${formatTimer(m.seconds||0)}
+      </div>
+      <hr style="border:none;border-top:1px solid #262626;margin:8px 0;">
+      <b>Formazione iniziale</b><br>
+      ${lu.starters.length
+        ? lu.starters.map(s=>`${s.role ? s.role+" – " : ""}${s.number} ${s.name}`).join("<br>")
+        : "<span style='color:#999;'>Non ancora inserita.</span>"}
+      <hr style="border:none;border-top:1px solid #262626;margin:8px 0;">
+      <b>Panchina</b><br>
+      ${lu.bench.length
+        ? lu.bench.map(b=>`${b.number} ${b.name}`).join("<br>")
+        : "—"}
+      <hr style="border:none;border-top:1px solid #262626;margin:8px 0;">
+      <b>Marcatori</b><br>
+      ${marcatori}
+      <hr style="border:none;border-top:1px solid #262626;margin:8px 0;">
+      <b>Assist</b><br>
+      ${assistHtml}
+      <hr style="border:none;border-top:1px solid #262626;margin:8px 0;">
+      <b>Cronaca</b><br>
+      ${cronacaHtml}
+    `;
+  }
+
+  function renderMatches(){
+    const box=document.getElementById("matchesList");
+    box.innerHTML="";
+    matches.forEach(m=>{
+      const home=(m.homeScore==null)?"-":m.homeScore;
+      const away=(m.awayScore==null)?"-":m.awayScore;
+      const label=
+        m.status==="FIN" ? "Terminata" :
+        m.status==="PRE" ? "Da giocare" :
+        "LIVE";
+      const pillClass=
+        m.status==="FIN" ? "pill pill-fin" :
+        m.status==="PRE" ? "pill pill-pre" :
+        "pill pill-live";
+
+      const card=document.createElement("div");
+      card.className="match-card";
+      card.innerHTML=`
         <div class="match-header">
           <div>
             <div class="match-round">${m.round} — ${m.category}</div>
-            <div class="field">${m.field}</div>
+            <div class="sub">${formatDateTime(m.dateTime)} • ${m.field}</div>
           </div>
-          <button class="btn-small" onclick="openMatchCenter(${m.id})">
-            Match center
-          </button>
+          <div class="${pillClass}">${label}</div>
         </div>
-
         <div class="teams-row">
-          <div class="team-name sansiro">${m.homeTeam}</div>
+          <div class="team-name ${m.homeTeam.includes("San Siro")?"sansiro":""}">${m.homeTeam}</div>
           <div class="score">${home} - ${away}</div>
-          <div class="team-name">${m.awayTeam}</div>
-        </div>
-
-        <div class="status-row">
-          <span class="${statusClass(m)}">${label}</span>
+          <div class="team-name ${m.awayTeam.includes("San Siro")?"sansiro":""}">${m.awayTeam}</div>
         </div>
       `;
-      box.appendChild(div);
+      box.appendChild(card);
     });
   }
 
-  function renderTopScorers() {
-    const box = document.getElementById("topScorersBox");
-    const map = {};
-
-    matches.forEach(m => {
-      (m.goals || []).forEach(g => {
-        if (!map[g.name]) map[g.name] = { goals: 0, assists: 0 };
-        map[g.name].goals += g.goals || 0;
-      });
-      (m.assists || []).forEach(a => {
-        if (!map[a.name]) map[a.name] = { goals: 0, assists: 0 };
-        map[a.name].assists += a.assists || 0;
-      });
-    });
-
-    const arr = Object.keys(map).map(name => ({
-      name,
-      goals: map[name].goals,
-      assists: map[name].assists
-    })).filter(p => p.goals > 0 || p.assists > 0);
-
-    if (!arr.length) {
-      box.textContent = "Ancora nessun marcatore registrato.";
-      return;
-    }
-
-    arr.sort((a,b) => {
-      if (b.goals !== a.goals) return b.goals - a.goals;
-      return b.assists - a.assists;
-    });
-
-    box.innerHTML = "";
-    arr.forEach(p => {
-      const row = document.createElement("div");
-      row.className = "ts-row";
-      row.innerHTML = `
-        <span class="ts-name">${p.name}</span>
-        <span class="ts-num">Gol: ${p.goals} • Assist: ${p.assists}</span>
-      `;
-      box.appendChild(row);
-    });
-  }
-
-  function openMatchCenter(id) {
-    const m = matches.find(x => x.id === id);
-    if (!m) return;
-    currentMatchCenterId = id;
-
-    document.getElementById("mainPage").style.display = "none";
-    document.getElementById("matchCenter").style.display = "block";
-
-    document.getElementById("mcTitle").textContent =
-      `${m.homeTeam} vs ${m.awayTeam}`;
-    const scoreText =
-      (m.homeScore === null || m.homeScore === undefined ||
-       m.awayScore === null || m.awayScore === undefined)
-      ? "- : -"
-      : `${m.homeScore} - ${m.awayScore}`;
-    document.getElementById("mcScore").textContent = scoreText;
-    document.getElementById("mcInfo").textContent =
-      `${m.round} • ${formatDateTime(m.dateTime)} • ${m.field}`;
-    document.getElementById("mcTimer").textContent =
-      `Stato: ${statusLabel(m)} • Timer: ${formatTimer(m.seconds||0)}`;
-
-    // Marcatori
-    const homeGoals = (m.goals || []).filter(g => g.team === "home");
-    const awayGoals = (m.goals || []).filter(g => g.team === "away");
-    document.getElementById("mcGoalsHome").innerHTML =
-      homeGoals.length
-        ? homeGoals.map(g => `${g.name} (${g.goals})`).join("<br>")
-        : "—";
-    document.getElementById("mcGoalsAway").innerHTML =
-      awayGoals.length
-        ? awayGoals.map(g => `${g.name} (${g.goals})`).join("<br>")
-        : "—";
-
-    // Assist
-    const assists = m.assists || [];
-    document.getElementById("mcAssists").innerHTML =
-      assists.length
-        ? assists.map(a => `${a.name} (${a.assists})`).join("<br>")
-        : "—";
-
-    // Formazioni
-    const lu = m.lineup || defaultLineup();
-    document.getElementById("mcLineup").innerHTML =
-      (lu.starting || []).map(p => p).join("<br>") || "—";
-    document.getElementById("mcBench").innerHTML =
-      (lu.bench || []).map(p => p).join("<br>") || "—";
-
-    // Cronaca
-    const evts = m.events || [];
-    document.getElementById("mcEvents").innerHTML =
-      evts.length
-        ? evts.map(e => `<div class="evt-row"><b>${e.minute}'</b> — ${e.text}</div>`).join("")
-        : "<i style='color:#999;'>Ancora nessuna azione registrata.</i>";
-
-    renderRatingsSection(m);
-    renderMvpSection(m);
-  }
-
-  function closeMatchCenter() {
-    document.getElementById("matchCenter").style.display = "none";
-    document.getElementById("mainPage").style.display = "block";
-    currentMatchCenterId = null;
-  }
-
-  /* VOTI */
-  function ratingKey(matchId, playerName) {
-    return `rate_${matchId}_${playerName}`;
-  }
-  function getStoredRating(matchId, playerName) {
-    const v = localStorage.getItem(ratingKey(matchId,playerName));
-    return v ? Number(v) : null;
-  }
-  function setStoredRating(matchId, playerName, value) {
-    localStorage.setItem(ratingKey(matchId,playerName), String(value));
-  }
-
-  function renderRatingsSection(match) {
-    const box = document.getElementById("mcRatings");
-    const lu = match.lineup || defaultLineup();
-    const players = lu.starting || [];
-    if (!players.length) {
-      box.textContent = "Formazione non disponibile.";
-      return;
-    }
-    const rows = players.map(p => {
-      const clean = p.replace(/^\d+\s*-\s*/, "");
-      const stored = getStoredRating(match.id, clean);
-      let dots = "";
-      for (let i = 5; i <= 10; i++) {
-        const cls = stored === i ? "active" : "";
-        dots += `<span class="${cls}" onclick="votePlayer(${match.id}, '${clean.replace(/'/g,"\\'")}', ${i}, this)">${i}</span>`;
-      }
-      return `
-        <div class="rating-row">
-          <div class="rating-name">${clean}</div>
-          <div class="rating-dots">${dots}</div>
-        </div>
-      `;
-    }).join("");
-    box.innerHTML = rows;
-  }
-
-  function votePlayer(matchId, playerName, value, el) {
-    setStoredRating(matchId, playerName, value);
-    openMatchCenter(matchId);
-    alert("Voto registrato!");
-  }
-
-  /* MVP */
-  function mvpKey(matchId) {
-    return `mvp_${matchId}`;
-  }
-  function getStoredMvp(matchId) {
-    return localStorage.getItem(mvpKey(matchId));
-  }
-  function setStoredMvp(matchId, playerName) {
-    localStorage.setItem(mvpKey(matchId), playerName);
-  }
-
-  function renderMvpSection(match) {
-    const box = document.getElementById("mcMvp");
-    const lu = match.lineup || defaultLineup();
-    const players = lu.starting || [];
-    if (!players.length) {
-      box.textContent = "Formazione non disponibile.";
-      return;
-    }
-    const selected = getStoredMvp(match.id);
-    box.innerHTML = players.map(p => {
-      const cls = (selected === p) ? "mvp-btn selected" : "mvp-btn";
-      return `<button class="${cls}" onclick="selectMvp(${match.id}, '${p.replace(/'/g,"\\'")}')">${p}</button>`;
-    }).join("");
-  }
-
-  function selectMvp(matchId, playerName) {
-    setStoredMvp(matchId, playerName);
-    openMatchCenter(matchId);
-    alert("MVP selezionato!");
-  }
-
-  function renderAll() {
-    renderCountdown();
-    renderMatches();
-    renderTopScorers();
-    if (currentMatchCenterId != null) {
-      openMatchCenter(currentMatchCenterId);
-    }
-  }
-
-  // Poll locale: se l'admin aggiorna i dati in un'altra tab dello STESSO browser
-  function pollStorage() {
-    const current = localStorage.getItem(STORAGE_KEY) || "";
-    if (current !== lastSnapshot) {
-      lastSnapshot = current;
-      try {
-        matches = JSON.parse(current);
-      } catch (e) {
-        matches = loadMatches();
-      }
-      renderAll();
-    }
-  }
-
-  // Init
-  window.addEventListener("load", () => {
+  function renderAll(){
     matches = loadMatches();
-    lastSnapshot = localStorage.getItem(STORAGE_KEY) || "";
+    renderCountdown();
+    renderTodayMatch();
+    renderMatches();
+  }
+
+  function pollStorage(){
     renderAll();
-    setInterval(pollStorage, 3000);
+  }
+
+  window.addEventListener("load",()=>{
+    renderAll();
+    setInterval(pollStorage,3000);
   });
 </script>
 </body>
