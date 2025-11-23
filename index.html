@@ -665,47 +665,54 @@
   }
 
   function renderMatches() {
-    const container = document.getElementById("matchesList");
-    container.innerHTML = "";
-    matches
-      .slice()
-      .sort((a,b) => new Date(a.dateTime) - new Date(b.dateTime))
-      .forEach(m => {
-        const card = document.createElement("div");
-        card.className = "match-card";
+  const box = document.getElementById("matches");
+  box.innerHTML = "";
 
-        const scoreText =
-          (m.homeScore === null || m.homeScore === undefined ||
-           m.awayScore === null || m.awayScore === undefined)
-          ? "- : -"
-          : `${m.homeScore} - ${m.awayScore}`;
+  matches.forEach(m => {
+    const home = m.homeScore !== null ? m.homeScore : "-";
+    const away = m.awayScore !== null ? m.awayScore : "-";
 
-        card.innerHTML = `
-          <div class="match-header">
-            <div>
-              <div class="match-round">${m.round}</div>
-              <div>${formatDateTime(m.dateTime)}</div>
-              <div>${m.field}</div>
-            </div>
-            <button class="btn-small" onclick="openMatchCenter(${m.id})">
-              Match Center
-            </button>
-          </div>
-          <div class="teams-row">
-            <div class="team-name sansiro">${m.homeTeam}</div>
-            <div class="score">${scoreText}</div>
-            <div class="team-name">${m.awayTeam}</div>
-          </div>
-          <div class="status-row">
-            <div class="${statusClass(m)}">${statusLabel(m)}</div>
-            <div>
-              <span style="margin-right:8px;">Timer: ${formatTimer(m.seconds||0)}</span>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-  }
+    let statusLabel = "";
+    if (m.status === "FIN") statusLabel = "Terminata";
+    else if (m.status === "PRE") statusLabel = "Da giocare";
+    else statusLabel = m.status + " • " + (m.minute ?? 0) + "'";
+
+    const div = document.createElement("div");
+    div.className = "match-card";
+    div.innerHTML = `
+      <div class="match-header">
+        <div>
+          <div class="category">${m.round} — ${m.category}</div>
+          <div class="field">${m.field}</div>
+        </div>
+        <button class="btn-small" onclick="openMatchCenter(${m.id})">
+          Match center
+        </button>
+      </div>
+
+      <div class="teams-row">
+        <div class="team sansiro">
+          <div class="team badge"></div>
+          <span>${m.homeTeam}</span>
+        </div>
+        <div class="score">${home} - ${away}</div>
+        <div class="team">
+          <span>${m.awayTeam}</span>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-pill ${m.status === "FIN" ? "status-fin" :
+                                m.status === "PRE" ? "status-pre" : "status-live"}">
+          ${statusLabel}
+        </div>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+
 
   function renderTopScorers() {
     const box = document.getElementById("topScorersBox");
