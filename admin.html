@@ -433,55 +433,90 @@
       : "<div class='evt-row' style='color:#aaa;'>Ancora nessuna cronaca.</div>";
   }
 
-  /* TIMER SEMPLICE */
-  function startTimer(){
-    const m = getCurrent();
-    if(!m)return;
-    if(m.status==="FIN"){
-      alert("La partita è già segnata come FINITA.");
-      return;
-    }
-    m.status="LIVE";
-    if(timerInterval) return;
+/* ===============================
+      TIMER 15' + RECUPERO
+=============================== */
+
+function startTimer(){
+  const m = getCurrent();
+  if(!m) return;
+
+  if(m.status === "FIN"){
+    alert("La partita è già terminata.");
+    return;
+  }
+
+  // se PRE → inizia 1° tempo
+  if(m.status === "PRE"){
+    m.status = "1T";
+    m.seconds = 0;
+  }
+
+  // se era fermo in 1T o 2T → continua
+  if(!timerInterval){
     lastTickTime = Date.now();
-    timerInterval = setInterval(()=>{
-      const now=Date.now();
-      const diff = Math.floor((now-lastTickTime)/1000);
-      if(diff>0){
-        m.seconds = (m.seconds||0) + diff;
-        lastTickTime = now;
-        saveMatches();
-        document.getElementById("timerDisplay").textContent = formatTimer(m.seconds||0);
-        document.getElementById("mTimer").textContent = `Timer salvato: ${formatTimer(m.seconds||0)}`;
-        document.getElementById("mStatus").textContent = `Stato: ${statusLabel(m)}`;
-      }
-    },1000);
+    timerInterval = setInterval(()=>tickTimer(),1000);
   }
 
-  function stopTimer(){
-    if(timerInterval){
-      clearInterval(timerInterval);
-      timerInterval=null;
+  saveMatches();
+  renderMatch();
+}
+
+function tickTimer(){
+  const m = getCurrent();
+  if(!m) return;
+
+  const now = Date.now();
+  const diff = Math.floor((now - lastTickTime)/1000);
+
+  if(diff > 0){
+    m.seconds += diff;
+    lastTickTime = now;
+
+    // cambio stato a RECUPERO
+    if(m.seconds >= 900 && m.status !== "RECUPERO" && m.status !== "2T" && m.status !== "FIN"){
+      m.status = "RECUPERO";
     }
-    lastTickTime=null;
+
     saveMatches();
-    renderMatch();
+    document.getElementById("timerDisplay").textContent = formatTimer(m.seconds);
+    document.getElementById("mTimer").textContent = `Timer salvato: ${formatTimer(m.seconds)}`;
+    document.getElementById("mStatus").textContent = `Stato: ${statusLabel(m)}`;
   }
+}
 
-  function resetTimer(){
-    const m=getCurrent(); if(!m)return;
-    if(!confirm("Azzero il timer e riporto lo stato a PRE?")) return;
-    m.seconds=0;
-    m.status="PRE";
-    stopTimer();
+function stopTimer(){
+  if(timerInterval){
+    clearInterval(timerInterval);
+    timerInterval = null;
   }
+  lastTickTime = null;
+  saveMatches();
+  renderMatch();
+}
 
-  function finishMatch(){
-    const m=getCurrent(); if(!m)return;
-    if(!confirm("Segno la partita come TERMINATA?")) return;
-    m.status="FIN";
-    stopTimer();
-  }
+function resetTimer(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!confirm("Azzero timer e riporto la partita a PRE?")) return;
+
+  m.seconds = 0;
+  m.status = "PRE";
+  stopTimer();
+}
+
+function finishMatch(){
+  const m = getCurrent();
+  if(!m) return;
+
+  if(!confirm("Segni la partita come TERMINATA?")) return;
+
+  m.status = "FIN";
+  stopTimer();
+  saveMatches();
+  renderMatch();
+}
+
 
   /* GOL & CRONACA */
   function addGoal(team){
