@@ -665,8 +665,46 @@
   }
 
   function renderMatches() {
-  const box = document.getElementById("matches");
+  const box = document.getElementById("matchesList");
   box.innerHTML = "";
+
+  matches.forEach(m => {
+    const home = m.homeScore !== null ? m.homeScore : "-";
+    const away = m.awayScore !== null ? m.awayScore : "-";
+
+    let statusLabel = "";
+    if (m.status === "FIN") statusLabel = "Terminata";
+    else if (m.status === "PRE") statusLabel = "Da giocare";
+    else statusLabel = "LIVE";
+
+    const div = document.createElement("div");
+    div.className = "match-card";
+    div.innerHTML = `
+      <div class="match-header">
+        <div>
+          <div class="match-round">${m.round} — ${m.category}</div>
+          <div class="field">${m.field}</div>
+        </div>
+        <button class="btn-small" onclick="openMatchCenter(${m.id})">
+          Match center
+        </button>
+      </div>
+
+      <div class="teams-row">
+        <div class="team-name sansiro">${m.homeTeam}</div>
+        <div class="score">${home} - ${away}</div>
+        <div class="team-name">${m.awayTeam}</div>
+      </div>
+
+      <div class="status-row">
+        <span class="${statusClass(m)}">${statusLabel}</span>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+
 
   matches.forEach(m => {
     const home = m.homeScore !== null ? m.homeScore : "-";
