@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diretta San Siro Nervi U14</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111;
+      color: #f5f5f5;
+    }
+    header {
+      background: #000;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header .logo {
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 16px;
+    }
+    header .logo span {
+      color: #e50914;
+    }
+    main {
+      padding: 12px 12px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h2.section-title {
+      font-size: 16px;
+      margin: 8px 0 12px;
+      color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .match-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .match-card {
+      background: #181818;
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid #262626;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #aaa;
+    }
+    .match-header .category {
+      font-weight: 600;
+      color: #f5f5f5;
+    }
+    .match-header .field {
+      font-size: 11px;
+    }
+    .teams-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    .team.sansiro {
+      font-weight: 600;
+      color: #fff;
+    }
+    .team-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #e50914;
+    }
+    .score {
+      font-size: 18px;
+      font-weight: 700;
+      min-width: 52px;
+      text-align: center;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #bbb;
+    }
+    .status-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid #444;
+    }
+    .status-pre {
+      border-color: #888;
+      color: #888;
+    }
+    .status-live {
+      border-color: #e50914;
+      color: #e50914;
+    }
+    .status-fin {
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+    .btn-small {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #333;
+      background: #222;
+      color: #eee;
+      cursor: pointer;
+    }
+    .btn-small:hover {
+      background: #333;
+    }
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      padding: 10px 0 16px;
+    }
+
+    .rating-dot {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      border-radius: 50%;
+      border: 1px solid #555;
+      text-align: center;
+      font-size: 12px;
+      margin-right: 4px;
+      margin-top: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .rating-dot.active {
+      background: #e5c14d;
+      border-color: #e5c14d;
+      color: #000;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #e50914;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 0 15px #000;
+      z-index: 9999;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex‑start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      DIRETTA <span>SAN SIRO</span> U14
+    </div>
+  </header>
+
+  <main id="mainPage">
+    <h2 class="section-title">
+      Partite
+      <span style="font-size:11px; color:#888;">San Siro Nervi U14</span>
+    </h2>
+
+    <div id="matches" class="match-list"></div>
+
+    <h2 class="section-title" style="margin-top:30px;">
+      Classifica Marcatori
+    </h2>
+
+    <div id="topScorers" style="
+      background:#181818;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #262626;
+      font-size:14px;
+      line‑height:1.6;
+    ">
+      Caricamento marcatori...
+    </div>
+  </main>
+
+  <div id="matchCenter" style="display:none;">
+    <button onclick="closeMatchCenter()" style="
+      margin‑bottom:12px;
+      padding:6px 12px;
+      border‑radius:6px;
+      border:none;
+      background:#e50914;
+      color:white;
+      font‑size:14px;
+      cursor:pointer;">
+      ← Torna indietro
+    </button>
+
+    <h2 id="mcTitle" style="margin‑top:0;"></h2>
+    <div id="mcScore" style="font‑size:22px; font‑weight:700; margin‑bottom:10px;"></div>
+    <div id="mcInfo" style="font‑size:13px; color:#bbb; margin‑bottom:15px;"></div>
+    <div id="mcStatus" style="font‑size:13px; color:#4caf50; margin‑bottom:15px;"></div>
+
+    <h3>Marcatori San Siro</h3>
+    <div id="mcScorers" style="margin‑bottom:20px;"></div>
+
+    <h3>Assist San Siro</h3>
+    <div id="mcAssists" style="margin‑bottom:20px;"></div>
+
+    <h3>Formazione iniziale</h3>
+    <ul id="mcLineup"></ul>
+
+    <h3 style="margin‑top:15px;">A disposizione</h3>
+    <ul id="mcBench"></ul>
+
+    <h3 style="margin‑top:20px;">Cronaca</h3>
+    <div id="mcEvents" style="margin‑bottom:20px;"></div>
+
+    <h3 style="margin‑top:25px;">Voti Giocatori</h3>
+    <div id="mcRatings" style="
+      background:#181818;
+      padding:12px;
+      border‑radius:10px;
+      border:1px solid #262626;
+    ">
+      <p style="color:#aaa; font‑size:13px;">Seleziona un giocatore e metti un voto da 5 a 10 (una sola volta per partita).</p>
+    </div>
+
+    <h3 style="margin‑top:25px;">MVP del Match</h3>
+    <div id="mcMvp" style="
+      background:#181818;
+      padding:12px;
+      border‑radius:10px;
+      border:1px solid #262626;
+      font‑size:15px;
+    ">
+      Nessun MVP selezionato.
+    </div>
+  </div>
+
+  <footer>
+    Diretta San Siro Nervi U14
+  </footer>
+
+  <script>
+    const STORAGE_KEY_MATCHES = "sansu_live_matches_v1";
+
+    function defaultLineup() {
+      return {
+        starting: [
+          "1 - Emanuele Micucci (POR)",
+          "11 - Amedeo Rebaudengo (TS)",
+          "6 - Maro Terenui Luca (DC)",
+          "25 - Edoardo Panebianco (TD)",
+          "8 - Alessandro Vitarelli (TRQ)",
+          "10 - Rocco Ronda (TRQ)",
+          "4 - Timoteo Meazzi (FW)"
+        ],
+        bench: [
+          "99 - Andrea Vitarelli",
+          "12 - Erik Joshue Perez Sanabria",
+          "5 - Leonardo Risso",
+          "35 - Diego Buzzi",
+          "7 - Gabriele Lanini",
+          "4 - Elio Cerfogli"
+        ]
+      };
+    }
+
+    const defaultMatches = [
+      {
+        id: 1,
+        round: "1ª giornata",
+        date: "18/10/2025",
+        time: "10:00",
+        category: "U14",
+        field: "Campo Meja",
+        homeTeam: "San Marziano U14",
+        awayTeam: "San Siro Nervi U14",
+        homeScore: 1,
+        awayScore: 1,
+        status: "FIN",
+        minute: 90,
+        goals: [
+          { name: "Edoardo Panebianco", goals: 1 }
+        ],
+        assists: [
+          { name: "Timoteo Meazzi", assists: 1 }
+        ],
+        events: [],
+        lineup: defaultLineup()
+      },
+      {
+        id: 2,
+        round: "2ª giornata",
+        date: "26/10/2025",
+        time: "16:30",
+        category: "U14",
+        field: "Campo Emiliani",
+        homeTeam: "San Siro Nervi U14",
+        awayTeam: "Fulgor Gialli U14",
+        homeScore: 8,
+        awayScore: 1,
+        status: "FIN",
+        minute: 90,
+        goals: [
+          { name: "Edoardo Panebianco", goals: 5 },
+          { name: "Rocco Ronda", goals: 1 },
+          { name: "Amedeo Rebaudengo", goals: 1 },
+          { name: "Andrea Vitarelli", goals: 1 }
+        ],
+        assists: [
+          { name: "Diego Buzzi", assists: 1 },
+          { name: "Alessandro Vitarelli", assists: 1 },
+          { name: "Amedeo Rebaudengo", assists: 2 }
+        ],
+        events: [],
+        lineup: defaultLineup()
+      },
+      {
+        id: 3,
+        round: "3ª giornata",
+        date: "09/11/2025",
+        time: "10:00",
+        category: "U14",
+        field: "Sestri Ponente",
+        homeTeam: "San Giovanni Battista U14",
+        awayTeam: "San Siro Nervi U14",
+        homeScore: 5,
+        awayScore: 6,
+        status: "FIN",
+        minute: 90,
+        goals: [
+          { name: "Rocco Ronda", goals: 4 },
+          { name: "Andrea Vitarelli", goals: 1 },
+          { name: "Alessandro Vitarelli", goals: 1 }
+        ],
+        assists: [
+          { name: "Gabriele Lanini", assists: 1 },
+          { name: "Alessandro Vitarelli", assists: 1 },
+          { name: "Amedeo Rebaudengo", assists: 1 }
+        ],
+        events: [],
+        lineup: defaultLineup()
+      },
+      {
+        id: 4,
+        round: "4ª giornata",
+        date: "23/11/2025",
+        time: "16:30",
+        category: "U14",
+        field: "Campo Emiliani",
+        homeTeam: "San Siro Nervi U14",
+        awayTeam: "Genova Sport College U14",
+        homeScore: null,
+        awayScore: null,
+        status: "PRE",
+        minute: 0,
+        goals: [],
+        assists: [],
+        events: [],
+        lineup: defaultLineup()
+      },
+      {
+        id: 5,
+        round: "5ª giornata",
+        date: "30/11/2025",
+        time: "10:30",
+        category: "U14",
+        field: "Campo Fumeri",
+        homeTeam: "Fulgor Verdi U14",
+        awayTeam: "San Siro Nervi U14",
+        homeScore: null,
+        awayScore: null,
+        status: "PRE",
+        minute: 0,
+        goals: [],
+        assists: [],
+        events: [],
+        lineup: defaultLineup()
+      },
+      {
+        id: 6,
+        round: "6ª giornata",
+        date: "14/12/2025",
+        time: "00:00",
+        category: "U14",
+        field: "Riposo",
+        homeTeam: "San Siro Nervi U14",
+        awayTeam: "—",
+        homeScore: null,
+        awayScore: null,
+        status: "PRE",
+        minute: 0,
+        goals: [],
+        assists: [],
+        events: [],
+        lineup: defaultLineup()
+      },
+      {
+        id: 7,
+        round: "7ª giornata",
+        date: "21/12/2025",
+        time: "16:30",
+        category: "U14",
+        field: "Campo Emiliani",
+        homeTeam: "San Siro Nervi U14",
+        awayTeam: "Polisportiva Pieve U14",
+        homeScore: null,
+        awayScore: null,
+        status: "PRE",
+        minute: 0,
+        goals: [],
+        assists: [],
+        events: [],
+        lineup: defaultLineup()
+      }
+    ];
+
+    function cloneDefaults() {
+      return JSON.parse(JSON.stringify(defaultMatches));
+    }
+
+    function loadMatches() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_MATCHES);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {
+        console.error(e);
+      }
+      return cloneDefaults();
+    }
+
+    function saveMatches() {
+      localStorage.setItem(STORAGE_KEY_MATCHES, JSON.stringify(matches));
+    }
+
+    let matches = loadMatches();
+
+    function getStatusClass(status) {
+      if (status === "FIN") return "status-pill status-fin";
+      if (status === "LIVE") return "status-pill status-live";
+      return "status-pill status-pre";
+    }
+
+    function getStatusLabel(m) {
+      if (m.status === "FIN") return "FIN • Terminata";
+      if (m.status === "LIVE") return `LIVE • ${m.minute ?? 0}'`;
+      if (m.status === "PRE") return `PRE • ${m.date} • ${m.time}`;
+      if (m.status === "INT") return "INTERVALLO";
+      return m.status || "";
+    }
+
+    function showToast(msg) {
+      const box = document.createElement("div");
+      box.className = "toast";
+      box.innerText = msg;
+      document.body.appendChild(box);
+      setTimeout(() => box.remove(), 1500);
+    }
+
+    function cleanPlayerName(str) {
+      let s = str.replace(/^\s*\d+\s*-\s*/, "");
+      s = s.replace(/\s*\([^)]+\)\s*$/, "");
+      return s.trim();
+    }
+
+    function renderMatches() {
+      const container = document.getElementById("matches");
+      container.innerHTML = "";
+      matches.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "match-card";
+        card.innerHTML = `
+          <div class="match-header">
+            <div>
+              <div class="category">${m.category} • ${m.round}</div>
+              <div class="field">${m.field}</div>
+            </div>
+            <button class="btn-small" onclick="openMatchCenter(${m.id})">
+              Match center
+            </button>
+          </div>
+          <div class="teams-row">
+            <div class="team">
+              <div class="team-badge"></div>
+              <span>${m.homeTeam}</span>
+            </div>
+            <div class="score">
+              ${m.homeScore === null ? "-" : m.homeScore} -
+              ${m.awayScore === null ? "-" : m.awayScore}
+            </div>
+            <div class="team">
+              <span>${m.awayTeam}</span>
+            </div>
+          </div>
+          <div class="status-row">
+            <div class="${getStatusClass(m.status)}">
+              ${getStatusLabel(m)}
+            </div>
+            <div style="font-size:11px; color:#777;">
+              ${m.date} • ${m.time}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderTopScorers() {
+      const map = {};
+      matches.forEach(m => {
+        (m.goals || []).forEach(g => {
+          if (!map[g.name]) {
+            map[g.name] = { goals: 0, assists: 0 };
+          }
+          map[g.name].goals += g.goals;
+        });
+        (m.assists || []).forEach(a => {
+          if (!map[a.name]) {
+            map[a.name] = { goals: 0, assists: 0 };
+          }
+          map[a.name].assists += a.assists;
+        });
+      });
+      const arr = Object.keys(map).map(name => ({
+        name,
+        goals: map[name].goals,
+        assists: map[name].assists
+      }));
+      arr.sort((a, b) => {
+        if (b.goals !== a.goals) return b.goals - a.goals;
+        return b.assists - a.assists;
+      });
+      const box = document.getElementById("topScorers");
+      if (!arr.length) {
+        box.innerHTML = "Nessun dato disponibile.";
+        return;
+      }
+      box.innerHTML = arr.map(p => `
+        <div style="padding:6px 0; border-bottom:1px solid #333;">
+          <b>${p.name}</b> — Gol: ${p.goals} • Assist: ${p.assists}
+        </div>
+      `).join("");
+    }
+
+    function openMatchCenter(id) {
+      const m = matches.find(x => x.id === id);
+      if (!m) return;
+      document.getElementById("mainPage").style.display = "none";
+      document.getElementById("matchCenter").style.display = "block";
+      document.getElementById("mcTitle").innerText = `${m.homeTeam} vs ${m.awayTeam}`;
+      document.getElementById("mcScore").innerText =
+        `${m.homeScore === null ? "-" : m.homeScore} - ${m.awayScore === null ? "-" : m.awayScore}`;
+      document.getElementById("mcInfo").innerText = `${m.field} • ${m.date} • ${m.time}`;
+      document.getElementById("mcStatus").innerText = getStatusLabel(m);
+      document.getElementById("mcScorers").innerHTML =
+        (m.goals && m.goals.length)
+          ? m.goals.map(g => `${g.name} (${g.goals})`).join("<br>")
+          : "Nessun gol";
+      document.getElementById("mcAssists").innerHTML =
+        (m.assists && m.assists.length)
+          ? m.assists.map(a => `${a.name} (${a.assists})`).join("<br>")
+          : "Nessun assist";
+      document.getElementById("mcLineup").innerHTML =
+        m.lineup.starting.map(p => `<li>${p}</li>`).join("");
+      document.getElementById("mcBench").innerHTML =
+        m.lineup.bench.map(p => `<li>${p}</li>`).join("");
+      const evBox = document.getElementById("mcEvents");
+      if (m.events && m.events.length) {
+        evBox.innerHTML = m.events.map(ev => `
+          <div style="padding:6px 0; border-bottom:1px solid #333;">
+            <b>${ev.minute}'</b> — ${ev.text}
+          </div>
+        `).join("");
+      } else {
+        evBox.innerHTML = "<i style='color:#888;'>Nessuna cronaca disponibile</i>";
+      }
+      const ratingsBox = document.getElementById("mcRatings");
+      ratingsBox.innerHTML = m.lineup.starting.map(player => {
+        const clean = cleanPlayerName(player);
+        const stored = localStorage.getItem(`rate_${m.id}_${clean}`) || null;
+        let dots = "";
+        for (let v = 5; v <= 10; v++) {
+          dots += `
+            <span class="rating-dot ${stored == v ? "active" : ""}"
+              onclick="ratePlayer(${m.id}, '${clean.replace(/'/g,"\\'")}', ${v}, this)">
+              ${v}
+            </span>
+          `;
+        }
+        return `
+          <div style="padding:8px 0; border-bottom:1px solid #333;">
+            <b>${clean}</b><br>${dots}
+          </div>
+        `;
+      }).join("");
+      renderMvpSection(m);
+    }
+
+    function closeMatchCenter() {
+      document.getElementById("matchCenter").style.display = "none";
+      document.getElementById("mainPage").style.display = "block";
+    }
+
+    function ratePlayer(matchId, playerName, value, el) {
+      const key = `rate_${matchId}_${playerName}`;
+      if (localStorage.getItem(key)) {
+        alert("Hai già votato questo giocatore per questa partita.");
+        return;
+      }
+      localStorage.setItem(key, value);
+      const row = el.parentElement;
+      Array.from(row.querySelectorAll(".rating-dot")).forEach(d => d.classList.remove("active"));
+      el.classList.add("active");
+      showToast("Voto registrato! 🔥");
+    }
+
+    function renderMvpSection(m) {
+      const box = document.getElementById("mcMvp");
+      const key = `mvp_${m.id}`;
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        box.innerHTML = `
+          <p><b>${stored}</b></p>
+          <p style="font-size:12px; color:#aaa;">Hai già votato l'MVP per questa partita su questo dispositivo.</p>
+        `;
+        return;
+      }
+      box.innerHTML = m.lineup.starting.map(p => `
+        <button
+          onclick="selectMvp(${m.id}, '${cleanPlayerName(p).replace(/'/g,"\\'")}')"
+          style="
+            width:100%;
+            margin‑bottom:6px;
+            padding:8px;
+            background:#222;
+            border:1px solid #444;
+            border‑radius:6px;
+            color:white;
+            font‑size:14px;
+            text‑align:left;
+          ">
+          ${p}
+        </button>
+      `).join("");
+    }
+
+    function selectMvp(matchId, playerName) {
+      const key = `mvp_${matchId}`;
+      if (localStorage.getItem(key)) {
+        alert("Hai già votato l'MVP per questa partita.");
+        return;
+      }
+      localStorage.setItem(key, playerName);
+      showToast("MVP votato! ⭐");
+      const m = matches.find(x => x.id === matchId);
+      if (m) renderMvpSection(m);
+    }
+
+    renderMatches();
+    renderTopScorers();
+  </script>
+</body>
+</html>

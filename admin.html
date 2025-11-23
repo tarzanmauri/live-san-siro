@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Diretta San Siro U14</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111;
+      color: #f5f5f5;
+    }
+    header {
+      background: #000;
+      padding: 12px 16px;
+      border‑bottom: 1px solid #333;
+    }
+    header h1 {
+      margin: 0;
+      font‑size: 18px;
+    }
+    main {
+      max‑width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    section {
+      background: #181818;
+      border‑radius: 10px;
+      border: 1px solid #262626;
+      padding: 12px 14px;
+      margin‑bottom: 14px;
+    }
+    h2 {
+      margin: 0 0 10px;
+      font‑size: 16px;
+    }
+    label {
+      font‑size: 13px;
+      display: block;
+      margin‑top: 8px;
+      margin‑bottom: 3px;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 8px;
+      border‑radius: 8px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      font‑size: 13px;
+      box‑sizing: border‑box;
+    }
+    textarea {
+      min‑height: 60px;
+      resize: vertical;
+    }
+    button {
+      padding: 8px 12px;
+      border‑radius: 8px;
+      border: none;
+      cursor: pointer;
+      font‑size: 13px;
+    }
+    .btn-primary {
+      background: #e50914;
+      color: #fff;
+    }
+    .btn-green {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-gray {
+      background: #444;
+      color: #fff;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      flex‑wrap: wrap;
+    }
+    .row > div {
+      flex: 1 1 150px;
+    }
+    .info‑line {
+      font‑size: 12px;
+      color: #aaa;
+      margin‑top: 4px;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #e50914;
+      color: #fff;
+      padding: 10px 16px;
+      border‑radius: 10px;
+      font‑size: 14px;
+      font‑weight: 700;
+      box‑shadow: 0 0 15px #000;
+      z‑index: 9999;
+    }
+    .match‑list {
+      font‑size: 13px;
+      line‑height: 1.5;
+    }
+    .match‑list div {
+      border‑bottom: 1px solid #333;
+      padding: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin · Diretta San Siro Nervi U14</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Seleziona partita</h2>
+      <label>Partita</label>
+      <select id="admMatchSelect"></select>
+      <div id="admMatchInfo" class="info‑line"></div>
+    </section>
+
+    <section>
+      <h2>2. Timer & Stato</h2>
+      <div class="row">
+        <div>
+          <label>Stato attuale</label>
+          <div id="admStatus" class="info‑line">—</div>
+        </div>
+        <div>
+          <label>Minuto</label>
+          <div id="admMinute" class="info‑line">00:00</div>
+        </div>
+      </div>
+      <div style="margin‑top:8px;" class="row">
+        <button class="btn-primary" onclick="startTimer()">Start</button>
+        <button class="btn-gray" onclick="stopTimer()">Stop</button>
+        <button class="btn-gray" onclick="resetTimer()">Reset</button>
+        <button class="btn-green" onclick="endMatch()">Fine partita</button>
+      </div>
+      <div class="info‑line">Timer in formato MM:SS, tre tempi da 15 minuti.</div>
+    </section>
+
+    <section>
+      <h2>3. Risultato</h2>
+      <div class="row">
+        <div>
+          <label>Gol Casa</label>
+          <input type="number" id="admHomeScore" />
+        </div>
+        <div>
+          <label>Gol Ospiti</label>
+          <input type="number" id="admAwayScore" />
+        </div>
+      </div>
+      <button style="margin‑top:8px;" class="btn-green" onclick="saveScore()">Salva risultato</button>
+      <div class="info‑line">Dopo aver appuntato il risultato, chiudi la partita.</div>
+    </section>
+
+    <section>
+      <h2>4. Gol & Assist (San Siro)</h2>
+      <label>Seleziona marcatore (San Siro)</label>
+      <select id="admScorer"></select>
+      <label>Assist (opzionale)</label>
+      <select id="admAssist"></select>
+      <label>Numero di gol da aggiungere</label>
+      <input type="number" id="admGoalCount" value="1" min="1" />
+      <button style="margin‑top:8px;" class="btn-primary" onclick="addGoalAssist()">Aggiungi Gol/Assist</button>
+      <div class="info‑line">Incrementa il gol della San Siro o dell’avversario automaticamente.</div>
+    </section>
+
+    <section>
+      <h2>5. Cronaca live</h2>
+      <div class="row">
+        <div>
+          <label>Minuto</label>
+          <input type="number" id="admEventMinute" value="1" min="0" />
+        </div>
+        <div>
+          <label>Tipo evento</label>
+          <select id="admEventType">
+            <option value="GOL">⚽ Gol</option>
+            <option value="ASSIST">🎯 Assist</option>
+            <option value="AMMONIZIONE">🟨 Ammonizione</option>
+            <option value="ESPULSIONE">🟥 Espulsione</option>
+            <option value="CAMBIO">🔄 Cambio</option>
+            <option value="OCCASIONE">🔥 Occasione</option>
+            <option value="ALTRO">📝 Altro</option>
+          </select>
+        </div>
+      </div>
+      <label>Descrizione evento</label>
+      <textarea id="admEventText" placeholder="Descrizione…"></textarea>
+      <button style="margin‑top:8px;" class="btn-primary" onclick="addEvent()">Aggiungi evento</button>
+    </section>
+
+    <section>
+      <h2>6. Data & Ora Partita</h2>
+      <div class="row">
+        <div>
+          <label>Nuova data</label>
+          <input type="date" id="admNewDate" />
+        </div>
+        <div>
+          <label>Nuova ora</label>
+          <input type="time" id="admNewTime" />
+        </div>
+      </div>
+      <button style="margin‑top:8px;" class="btn-green" onclick="updateDatetime()">Salva data/or...
