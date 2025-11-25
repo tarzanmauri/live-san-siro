@@ -183,6 +183,21 @@
     <button onclick="quickAwayPlus()" class="btn-sec">+ Gol Avversari</button>
     <button onclick="quickAwayMinus()" class="btn-sec">-</button>
   </div>
+<!-- RISULTATO FINALE RAPIDO -->
+<div style="margin-bottom:15px; margin-top:10px; padding:10px; border:1px solid #333; border-radius:8px;">
+  <label style="display:block;margin-bottom:5px;">Imposta risultato finale (per partite già giocate):</label>
+
+  <div style="display:flex; gap:10px; align-items:center;">
+    <input id="finalHome" type="number" min="0" placeholder="San Siro" class="input" style="flex:1;">
+    <span style="font-weight:bold;">-</span>
+    <input id="finalAway" type="number" min="0" placeholder="Avversari" class="input" style="flex:1;">
+  </div>
+
+  <button onclick="setFinalScore()" class="btn-main" style="margin-top:10px;width:100%;">
+    Imposta risultato finale
+  </button>
+</div>
+
 
   <!-- AGGIUNTA GOL COMPLETA -->
   <div style="margin-bottom:15px;">
@@ -1060,6 +1075,7 @@ function quickSaveAll(){
   alert("Dati post-partita salvati.");
   renderMatch();
 }
+
 // -------------------
 // SBLOCCO MANUALE PARTITA
 // -------------------
@@ -1073,6 +1089,30 @@ function forceUnlock(){
   renderMatch();
 }
 
+// ----------------------------------
+// RISULTATO FINALE RAPIDO
+// ----------------------------------
+function setFinalScore(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
+
+  const h = parseInt(document.getElementById("finalHome").value);
+  const a = parseInt(document.getElementById("finalAway").value);
+
+  if(isNaN(h) || isNaN(a)){
+    alert("Inserisci due numeri validi.");
+    return;
+  }
+
+  m.homeScore = h;
+  m.awayScore = a;
+
+  saveMatches();
+  renderMatch();
+
+  alert("Risultato finale impostato. Ora puoi inserire i marcatori.");
+}
 
 // -------------------
 // INIT
