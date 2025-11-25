@@ -155,7 +155,62 @@
       <button class="btn-main" id="btnGolHome" onclick="addGoal('home')">+ Gol San Siro</button>
       <button class="btn-sec" id="btnGolAway" onclick="addGoal('away')">+ Gol Avversari</button>
       <button class="btn-reset" id="btnResetMatch" onclick="resetMatchData()">RESET PARTITA</button>
-    </div>
+<!-- SBLOCCA PARTITA -->
+<button class="btn-sec" id="btnUnlock"
+        style="margin-top:8px;width:100%;display:none;"
+        onclick="unlockMatch()">SBLOCCA PARTITA</button>
+
+<button class="btn-sec" style="margin-top:8px;width:100%;"
+        onclick="forceUnlock()">FORZA SBLOCCO</button>
+
+</div>
+<!-- INSERIMENTO RAPIDO POST-PARTITA -->
+<div id="quickInsertBox" style="
+    margin-top:20px;
+    padding:15px;
+    border:1px solid #444;
+    border-radius:10px;
+    background:#1a1a1a;
+    display:none;
+">
+  <h3 style="margin-top:0;color:#ffd700;">INSERIMENTO RAPIDO</h3>
+
+  <!-- RISULTATO -->
+  <div style="margin-bottom:15px;">
+    <label style="display:block;margin-bottom:5px;">Risultato veloce:</label>
+    <button onclick="quickHomePlus()" class="btn-sec">+ Gol San Siro</button>
+    <button onclick="quickHomeMinus()" class="btn-sec">-</button>
+    <button onclick="quickAwayPlus()" class="btn-sec">+ Gol Avversari</button>
+    <button onclick="quickAwayMinus()" class="btn-sec">-</button>
+  </div>
+
+  <!-- AGGIUNTA GOL COMPLETA -->
+  <div style="margin-bottom:15px;">
+    <label style="display:block;margin-bottom:5px;">Aggiungi gol:</label>
+
+    <select id="quickScorer" class="input">
+      <option value="">Seleziona marcatore</option>
+    </select>
+
+    <select id="quickAssist" class="input" style="margin-top:5px;">
+      <option value="">Assist (opzionale)</option>
+    </select>
+
+    <select id="quickTimePeriod" class="input" style="margin-top:5px;">
+      <option value="1T">1º Tempo</option>
+      <option value="2T">2º Tempo</option>
+      <option value="3T">3º Tempo</option>
+    </select>
+
+    <input id="quickMinute" class="input" type="number" min="1" max="30"
+           placeholder="Minuto (1–15 o 15 + recupero)"
+           style="margin-top:5px;">
+
+    <button onclick="quickAddGoal()" class="btn-sec" style="margin-top:8px;">+ Aggiungi Gol</button>
+  </div>
+
+  <button onclick="quickSaveAll()" class="btn-reset" style="width:100%;">SALVA PARTITA</button>
+</div>
 
     <!-- Box fisso per MARCATORE / ASSIST -->
     <div style="margin-top:12px;padding:10px;background:#111;border-radius:8px;">
@@ -400,12 +455,26 @@
     }
   }
 
-  function formatTimer(sec){
-    const s=sec||0;
-    const mm=String(Math.floor(s/60)).padStart(2,"0");
-    const ss=String(s%60).padStart(2,"0");
-    return mm+":"+ss;
-  }
+function formatTimer(sec){
+    const s = sec || 0;
+    const mm = Math.floor(s / 60);
+    const ss = String(s % 60).padStart(2, "0");
+
+    // Se siamo nei 15 minuti regolamentari
+    if (mm < 15) {
+        return String(mm).padStart(2, "0") + ":" + ss;
+    }
+
+    // Quando arriva a 15:00 → fine tempo
+    if (mm === 15) {
+        return "15:00 (FINE TEMPO)";
+    }
+
+    // Oltre 15' → RECUPERO
+    const recupero = mm - 15;
+    return `15:00 +${recupero} RECUPERO`;
+}
+
   function formatDateTime(dtStr){
     const d=new Date(dtStr);
     if(isNaN(d))return dtStr;
@@ -423,17 +492,28 @@
            d.getMonth()===now.getMonth() &&
            d.getDate()===now.getDate();
   }
-  function isEditable(m){
-    if(!m) return false;
+function isEditable(m){
+  if(!m) return false;
+  if(m.status === "UNLOCKED") return true;
+  if(m.status === "FIN") return false;
+  if(isTodayMatch(m)) return true;
+  return false;
+}
 
-    // Se la partita è finita → NON modificabile
-    if(m.status === "FIN") return false;
 
-    // PERMETTO SOLO la 4ª giornata (quella di oggi)
-    if(m.id === 4) return true;
+function unlockMatch(){
+  const m = getCurrent();
+  if(!m) return;
 
-    // Tutte le altre NON modificabili
-    return false;
+  if(m.status !== "FIN"){
+    alert("Puoi sbloccare solo una partita finita.");
+    return;
+  }
+
+  m.status = "UNLOCKED";
+  saveMatches();
+  alert("Partita sbloccata. Ora puoi modificarla.");
+  renderMatch();
 }
 
 
@@ -482,7 +562,29 @@
       oA.textContent=`${p.number} - ${p.name}`;
       selA.appendChild(oA);
     });
-  }
+
+    // --- INSERIMENTO RAPIDO ---
+    const qScorer = document.getElementById("quickScorer");
+    const qAssist = document.getElementById("quickAssist");
+
+    if(qScorer && qAssist){
+      qScorer.innerHTML = "<option value=''>Seleziona marcatore</option>";
+      qAssist.innerHTML = "<option value=''>Assist (opzionale)</option>";
+
+      PLAYERS.forEach(p=>{
+        const opt1=document.createElement("option");
+        opt1.value=p.name;
+        opt1.textContent=`${p.number} - ${p.name}`;
+        qScorer.appendChild(opt1);
+
+        const opt2=document.createElement("option");
+        opt2.value=p.name;
+        opt2.textContent=`${p.number} - ${p.name}`;
+        qAssist.appendChild(opt2);
+      });
+    }
+
+}  // <-- QUESTO CHIUDE LA FUNZIONE
 
   function getCurrent(){return matches.find(m=>m.id===Number(currentId));}
 
@@ -492,10 +594,31 @@
     renderMatch();
   }
 
-  function renderMatch(){
-    const m=getCurrent();
-    if(!m)return;
-    const editable=isEditable(m);
+ function renderMatch(){
+  const m = getCurrent();
+  if(!m) return;
+
+  const unlockBtn = document.getElementById("btnUnlock");
+  if(unlockBtn){
+    if(m.status === "FIN"){
+      unlockBtn.style.display = "block";
+    } else {
+      unlockBtn.style.display = "none";
+    }
+  }
+
+  const editable = isEditable(m);
+// --- MOSTRA / NASCONDI INSERIMENTO RAPIDO ---
+const quickBox = document.getElementById("quickInsertBox");
+
+if(quickBox){
+  if(m.status === "FIN" || m.status === "UNLOCKED"){
+    quickBox.style.display = "block";
+  } else {
+    quickBox.style.display = "none";
+  }
+}
+
 
     const scoreText =
       (m.homeScore==null || m.awayScore==null) ? "- : -" : `${m.homeScore} - ${m.awayScore}`;
@@ -812,10 +935,151 @@ function addGoal(team){
       ? evts.slice(-5).map(e=>`<div class="evt-row"><b>${e.minute}'</b> ${e.text}</div>`).join("")
       : "<div class='evt-row' style='color:#aaa;'>Ancora nessuna cronaca.</div>";
   }
+// -------------------
+// RISULTATO VELOCE
+// -------------------
+function quickHomePlus(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
 
-  window.addEventListener("load",()=>{
-    // non inizializzo finché non fai login
+  m.homeScore = (m.homeScore || 0) + 1;
+  saveMatches();
+  renderMatch();
+}
+
+function quickHomeMinus(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
+
+  m.homeScore = Math.max(0, (m.homeScore || 0) - 1);
+  saveMatches();
+  renderMatch();
+}
+
+function quickAwayPlus(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
+
+  m.awayScore = (m.awayScore || 0) + 1;
+  saveMatches();
+  renderMatch();
+}
+
+function quickAwayMinus(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
+
+  m.awayScore = Math.max(0, (m.awayScore || 0) - 1);
+  saveMatches();
+  renderMatch();
+}
+
+// -------------------
+// AGGIUNTA GOL COMPLETA (INSERIMENTO RAPIDO)
+// -------------------
+function quickAddGoal(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
+
+  const scorer = document.getElementById("quickScorer").value;
+  const assist = document.getElementById("quickAssist").value;
+  const periodo = document.getElementById("quickTimePeriod").value;
+  let minuto = parseInt(document.getElementById("quickMinute").value);
+
+  if(!scorer){
+    alert("Seleziona il marcatore");
+    return;
+  }
+  if(isNaN(minuto) || minuto < 1){
+    alert("Minuto non valido");
+    return;
+  }
+
+  // Formatta minuto o recupero (15'+X)
+  let minutoFormattato = "";
+  if (minuto <= 15) {
+    minutoFormattato = `${minuto}'`;
+  } else {
+    const rec = minuto - 15;
+    minutoFormattato = `15'+${rec}`;
+  }
+
+  // Aggiorna punteggio
+  m.homeScore = (m.homeScore || 0) + 1;
+
+  // Aggiorna marcatori
+  if(!m.goals) m.goals=[];
+  let g = m.goals.find(x => x.name === scorer && x.team === "home");
+  if(!g){
+    g = { team:"home", name:scorer, goals:0 };
+    m.goals.push(g);
+  }
+  g.goals++;
+
+  // Aggiorna assist
+  if(assist){
+    if(!m.assists) m.assists=[];
+    let a = m.assists.find(x => x.name === assist);
+    if(!a){
+      a = {name:assist, assists:0};
+      m.assists.push(a);
+    }
+    a.assists++;
+  }
+
+  // Aggiorna cronaca
+  if(!m.events) m.events=[];
+  m.events.push({
+    minute:minuto,
+    text:`${periodo} • ${minutoFormattato} – GOL SAN SIRO – ${scorer}${assist ? " (assist "+assist+")" : ""}`
   });
+
+  saveMatches();
+  renderMatch();
+
+  // pulizia
+  document.getElementById("quickMinute").value = "";
+}
+
+
+// -------------------
+// SALVA TUTTO POST-PARTITA
+// -------------------
+function quickSaveAll(){
+  const m = getCurrent();
+  if(!m) return;
+  if(!isEditable(m)) return;
+
+  m.status = "FIN";
+  saveMatches();
+  alert("Dati post-partita salvati.");
+  renderMatch();
+}
+// -------------------
+// SBLOCCO MANUALE PARTITA
+// -------------------
+function forceUnlock(){
+  const m = getCurrent();
+  if(!m) return;
+
+  m.status = "UNLOCKED";
+  saveMatches();
+  alert("Partita sbloccata manualmente.");
+  renderMatch();
+}
+
+
+// -------------------
+// INIT
+// -------------------
+window.addEventListener("load",()=>{
+  // non inizializzo finché non fai login
+});
 </script>
 </body>
 </html>
